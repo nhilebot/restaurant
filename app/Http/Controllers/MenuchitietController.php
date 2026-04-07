@@ -1,0 +1,58 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Menu;
+use Illuminate\Http\Request;
+
+class MenuchitietController extends Controller
+{
+    public function index()
+    {
+        $menus = Menu::all();
+        return view('menu', compact('menus'));
+    }
+
+    public function special()
+    {
+        $menus = Menu::where('category', 'special')->get();
+        return view('special', compact('menus'));
+    }
+
+    public function salad()
+    {
+        $menus = Menu::where('category', 'salad')->get();
+        return view('salad', compact('menus'));
+    }
+
+    public function desserts()
+{
+    // Nếu trong DB category là 'dessert'
+    $menus = Menu::where('category', 'dessert')->get();
+    return view('desserts', compact('menus'));
+}
+
+    public function drinks()
+    {
+        $menus = Menu::where('category', 'drink')->get();
+        return view('drinks', compact('menus'));
+    }
+
+    public function seafood()
+    {
+        $menus = Menu::where('category', 'seafood')->get();
+        return view('seafood', compact('menus'));
+    }
+
+    public function vietnamese()
+    {
+        $menus = Menu::where('category', 'vietnamese')->get();
+        return view('vietnamese', compact('menus'));
+    }
+
+    public function showDetail($id)
+    {
+        $menu = Menu::findOrFail($id);
+        return view('detail', compact('menu')); // đổi nếu file view khác
+    }
+}

@@ -1,0 +1,48 @@
+/* ====== BUTTON CONTAINER ====== */
+.action-buttons {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 30px;
+    margin-top: 80px;
+}
+
+/* ====== BUTTON STYLE ====== */
+.btn-main {
+    padding: 14px 42px;
+    border: 2px solid #ffffff;
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 16px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    font-weight: 500;
+    transition: all 0.35s ease;
+    display: inline-block;
+    min-width: 200px;
+    text-align: center;
+    background: transparent;
+}
+
+/* ====== HOVER (giống web xịn) ====== */
+.btn-main:hover {
+    background-color: #d9f2fc;
+    color: #000000;
+    border-color: #ffffff;
+}
+
+/* ====== CANH GIỮA THEO CHIỀU DỌC (nếu nằm trên banner) ====== */
+.starter_container {
+    position: relative;
+}
+
+.action-buttons {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    gap: 100px;
+    justify-content: center; /* căn giữa theo chiều ngang */
+    align-items: center;     /* căn giữa theo chiều dọc */
+    height: 100vh;           /* chiếm toàn bộ chiều cao màn hình */
+}
+
