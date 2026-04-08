@@ -3,10 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Order;
 use App\Models\Menu;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB; // Thêm DB để dùng Transaction
 
 class ReservationController extends Controller
 {
@@ -38,73 +35,47 @@ class ReservationController extends Controller
 
     public function store(Request $request)
     {
-        // 1. Validate dữ liệu
         $request->validate([
-            'table_number' => 'required|string',
-            'menu_items'   => 'required|array|min:1',
+            'reservation_date' => 'required',
+            'reservation_time' => 'required',
+            'full_name'        => 'required',
+            'phone'            => 'required',
+            'table_id'         => 'required',
         ]);
-        session()->put('table_number', $request->table_number);
 
-        // 2. Lọc các món được chọn hợp lệ
-        $selectedItems = collect($request->menu_items)->filter(function ($item) {
-            return isset($item['selected']) && $item['selected'] == '1' 
-                && isset($item['quantity']) && $item['quantity'] > 0;
-        });
+        $reservationInfo = [
+            'date'   => $request->reservation_date . ' ' . $request->reservation_time,
+            'table'  => $request->table_id,
+            'status' => 'Chờ xác nhận',
+            'name'   => $request->full_name,
+            'phone'  => $request->phone,
+            'notes'  => $request->notes ?? '',
+        ];
 
-        if ($selectedItems->isEmpty()) {
-            return back()->withErrors(['menu_items' => 'Vui lòng chọn ít nhất một món.']);
-        }
+        session()->put('reservation_info', $reservationInfo);
 
-        // 3. Sử dụng Transaction để đảm bảo an toàn dữ liệu (nếu lỗi thì không lưu gì cả)
-        try {
-            return DB::transaction(function () use ($selectedItems, $request) {
-                $totalPrice = 0;
-                $tempOrderItems = [];
+        if ($request->has('foods') && is_array($request->foods)) {
+            $cart = session()->get('cart', []);
 
-                foreach ($selectedItems as $item) {
-                    $menu = Menu::find($item['id']);
-
-                    if (!$menu) {
-                        throw new \Exception("Món ăn không tồn tại.");
-                    }
-
-                    if ($menu->stock < $item['quantity']) {
-                        throw new \Exception("Món " . $menu->name . " hiện không đủ số lượng.");
-                    }
-
-                    $price = $menu->price;
-                    $subTotal = $price * $item['quantity'];
-                    $totalPrice += $subTotal;
-
-                    $tempOrderItems[] = [
-                        'menu_id'  => $menu->id,
-                        'quantity' => $item['quantity'],
-                        'price'    => $price,
-                    ];
-
-                    // Giảm tồn kho ngay
-                    $menu->decrement('stock', $item['quantity']);
+            foreach ($request->foods as $id => $item) {
+                $menu = Menu::find($id);
+                if (!$menu) {
+                    continue;
                 }
 
-                // Tạo đơn hàng
-                $order = Order::create([
-                    'user_id'      => Auth::id(),
-                    'table_number' => $request->table_number,
-                    'total_price'  => $totalPrice,
-                    'status'       => 'pending',
-                    'note'         => $request->note, // Lưu thêm ghi chú nếu có
-                ]);
+                $cart[$id] = [
+                    'id'       => $menu->id,
+                    'name'     => $menu->name,
+                    'price'    => $menu->price,
+                    'quantity' => $item['quantity'],
+                    'image'    => $menu->image,
+                ];
+            }
 
-                // Lưu chi tiết đơn hàng
-                foreach ($tempOrderItems as $detail) {
-                    $order->orderItems()->create($detail);
-                }
-
-                return redirect()->route('reservation.index')
-                                 ->with('success', 'Đặt bàn và chọn món thành công!');
-            });
-        } catch (\Exception $e) {
-            return back()->withErrors(['error' => $e->getMessage()]);
+            session()->put('cart', $cart);
         }
+
+        return redirect()->route('cart.index')
+                         ->with('success', 'Thông tin đặt bàn đã được lưu. Vui lòng kiểm tra lại đơn hàng.');
     }
 }

@@ -67,4 +67,12 @@ Route::middleware(['auth'])->group(function () {
     
     // Lưu thông tin đặt bàn vào DB
     Route::post('/reservation/store', [ReservationController::class, 'store'])->name('reservation.store');
+    // web.php
+
+    // Route hiển thị trang giỏ hàng
+    Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+
+    // Route xử lý lưu đặt bàn (đã có trong form của bạn)
+    Route::post('/reservation/store', [ReservationController::class, 'store'])->name('reservation.store');
+    
 });

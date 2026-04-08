@@ -81,28 +81,36 @@
         </div>
 
         @if(count($cart) > 0)
+            <div class="reservation-info" style="background: #fff; padding: 18px; border: 1px solid #eee; border-radius: 10px; margin-bottom: 20px;">
+                <h5 style="margin-top: 0; color: #d9534f; font-weight: bold;">Thông tin đặt bàn</h5>
+                <p style="margin-bottom: 8px;"><strong>Khách hàng:</strong> {{ $reservation['name'] }}</p>
+                <p style="margin-bottom: 8px;"><strong>Số điện thoại:</strong> {{ $reservation['phone'] }}</p>
+                <p style="margin-bottom: 8px;"><strong>Ngày/giờ:</strong> {{ $reservation['date'] }}</p>
+                <p style="margin-bottom: 8px;"><strong>Bàn:</strong> Bàn {{ $reservation['table'] }}</p>
+                <p style="margin-bottom: 0;"><strong>Ghi chú:</strong> {{ $reservation['notes'] ?: 'Không có' }}</p>
+            </div>
+
             <div class="clearfix">
                 <form action="{{ route('cart.checkout') }}" method="POST">
-    @csrf
-    @if(session('error'))
-        <div style="background: #ffe6e6; color: #d9534f; padding: 15px; border-radius: 5px; margin-bottom: 20px; border: 1px solid #d9534f;">
-            <strong>⚠️ HỆ THỐNG BÁO LỖI:</strong> {{ session('error') }}
-        </div>
-    @endif
+                    @csrf
+                    @if(session('error'))
+                        <div style="background: #ffe6e6; color: #d9534f; padding: 15px; border-radius: 5px; margin-bottom: 20px; border: 1px solid #d9534f;">
+                            <strong>⚠️ HỆ THỐNG BÁO LỖI:</strong> {{ session('error') }}
+                        </div>
+                    @endif
 
-    @if($errors->any())
-        <div style="background: #ffe6e6; color: #d9534f; padding: 15px; border-radius: 5px; margin-bottom: 20px; border: 1px solid #d9534f;">
-            <strong>⚠️ BẠN NHẬP THIẾU THÔNG TIN:</strong>
-            <ul style="margin-bottom: 0;">
-                @foreach($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
-    <form action="{{ route('cart.checkout') }}" method="POST">
-    
-    <div style="background: #fff; padding: 20px; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 20px; text-align: left;">
+                    @if($errors->any())
+                        <div style="background: #ffe6e6; color: #d9534f; padding: 15px; border-radius: 5px; margin-bottom: 20px; border: 1px solid #d9534f;">
+                            <strong>⚠️ BẠN NHẬP THIẾU THÔNG TIN:</strong>
+                            <ul style="margin-bottom: 0;">
+                                @foreach($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+
+                    <div style="background: #fff; padding: 20px; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 20px; text-align: left;">
         <h5 style="color: #d9534f; font-weight: bold; margin-bottom: 15px;"><i class="fa fa-user"></i> Thông tin giao hàng</h5>
         
         <div class="row">
@@ -153,7 +161,9 @@
 <br>
 <div style="display: flex; justify-content: center; width: 100%; margin-top: 20px;">
     <button type="submit" class="btn-checkout" style="padding: 12px 30px; font-size: 16px;"><i class="fa fa-check-circle"></i> XÁC NHẬN THANH TOÁN</button>
-</div>            </div>
+</div>
+                </form>
+            </div>
         @endif
     </div>
 </div>

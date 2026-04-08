@@ -18,7 +18,10 @@ class CartController extends Controller
         $reservation = session()->get('reservation_info', [
             'date' => date('d/m/Y'), 
             'table' => 'Chưa chọn',
-            'status' => 'Đang chờ thanh toán'
+            'status' => 'Đang chờ thanh toán',
+            'name' => 'Khách vãng lai',
+            'phone' => 'Chưa có',
+            'notes' => ''
         ]);
 
         $total = 0;
