@@ -7,75 +7,72 @@ use App\Models\Menu;
 
 class ReservationController extends Controller
 {
-    /**
-     * Chỉ cho phép người đã đăng nhập truy cập các hàm trong này
-     */
     public function __construct()
     {
         $this->middleware('auth');
     }
 
-  public function index()
-{
-    // 1. Lấy danh sách thực đơn từ Database (Sửa lỗi Undefined variable $menus)
-    $menus = \App\Models\Menu::all(); // Thay bằng Model thực tế của bạn
-
-    // 2. Lấy giỏ hàng hiện tại từ session (Sửa lỗi Undefined variable $cart)
-    $cart = session()->get('cart', []);
-
-    // 3. Tính tổng tiền cho phần hiển thị "Món ăn đã chọn"
-    $total = 0;
-    foreach($cart as $item) {
-        $total += $item['price'] * $item['quantity'];
-    }
-
-    // 4. Truyền tất cả biến sang View
-    return view('reservation', compact('menus', 'cart', 'total'));
-}
-
-    public function store(Request $request)
+    // HIỂN THỊ TRANG ĐẶT MÓN
+    public function index()
     {
-        $request->validate([
-            'reservation_date' => 'required',
-            'reservation_time' => 'required',
-            'full_name'        => 'required',
-            'phone'            => 'required',
-            'table_id'         => 'required',
-        ]);
+        $menus = Menu::all();
 
-        $reservationInfo = [
-            'date'   => $request->reservation_date . ' ' . $request->reservation_time,
-            'table'  => $request->table_id,
-            'status' => 'Chờ xác nhận',
-            'name'   => $request->full_name,
-            'phone'  => $request->phone,
-            'notes'  => $request->notes ?? '',
-        ];
+        $cart = session()->get('cart', []);
 
-        session()->put('reservation_info', $reservationInfo);
-
-        if ($request->has('foods') && is_array($request->foods)) {
-            $cart = session()->get('cart', []);
-
-            foreach ($request->foods as $id => $item) {
-                $menu = Menu::find($id);
-                if (!$menu) {
-                    continue;
-                }
-
-                $cart[$id] = [
-                    'id'       => $menu->id,
-                    'name'     => $menu->name,
-                    'price'    => $menu->price,
-                    'quantity' => $item['quantity'],
-                    'image'    => $menu->image,
-                ];
-            }
-
-            session()->put('cart', $cart);
+        $total = 0;
+        foreach ($cart as $item) {
+            $total += $item['price'] * $item['quantity'];
         }
 
-        return redirect()->route('cart.index')
-                         ->with('success', 'Thông tin đặt bàn đã được lưu. Vui lòng kiểm tra lại đơn hàng.');
+        return view('reservation', compact('menus', 'cart', 'total'));
     }
+
+    // LƯU ĐẶT BÀN + MÓN
+    public function store(Request $request)
+{
+    $request->validate([
+        'reservation_date' => 'required',
+        'reservation_time' => 'required',
+        'table_id'         => 'required',
+        'notes'            => 'nullable|string|max:255', // ✅ thêm lại ghi chú
+    ]);
+
+    $reservationInfo = [
+        'date'   => $request->reservation_date . ' ' . $request->reservation_time,
+        'table'  => $request->table_id,
+        'status' => 'Chờ xác nhận',
+        'notes'  => $request->notes ?? '', // ✅ lưu ghi chú
+    ];
+
+    session()->put('reservation_info', $reservationInfo);
+
+    // xử lý cart giữ nguyên
+    if ($request->has('foods') && is_array($request->foods)) {
+
+        $cart = [];
+
+        foreach ($request->foods as $id => $item) {
+
+            if (!isset($item['quantity']) || $item['quantity'] <= 0) {
+                continue;
+            }
+
+            $menu = Menu::find($id);
+            if (!$menu) continue;
+
+            $cart[$id] = [
+                'id'       => $menu->id,
+                'name'     => $menu->name,
+                'price'    => $menu->price,
+                'quantity' => $item['quantity'],
+                'image'    => $menu->image,
+            ];
+        }
+
+        session()->put('cart', $cart);
+    }
+
+    return redirect()->route('cart.index')
+        ->with('success', 'Đã lưu đơn hàng.');
+}
 }
