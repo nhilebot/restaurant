@@ -6,52 +6,132 @@
     <title>Restaurant - Reservation</title>
     
     <link rel="stylesheet" href="{{ asset('css/normalize.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/main.css') }}" media="screen" type="text/css">
-    <link href='http://fonts.googleapis.com/css?family=Pacifico' rel='stylesheet' type='text/css'>
-    <link href='http://fonts.googleapis.com/css?family=Playball' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="{{ asset('css/main.css') }}">
     <link rel="stylesheet" href="{{ asset('css/bootstrap.css') }}">
     <link rel="stylesheet" href="{{ asset('css/style-portfolio.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/picto-foundry-food.css') }}" />
+    <link rel="stylesheet" href="{{ asset('css/picto-foundry-food.css') }}">
     <link rel="stylesheet" href="{{ asset('css/jquery-ui.css') }}">
     <link href="{{ asset('css/font-awesome.min.css') }}" rel="stylesheet">
-    <link rel="icon" href="favicon-1.ico" type="image/x-icon">
+    <link href='http://fonts.googleapis.com/css?family=Pacifico' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Playball' rel='stylesheet' type='text/css'>
 
     <style>
-        /* CSS Giữ nguyên như bản trước để đảm bảo giao diện đẹp */
+        /* ===== COPY CSS TỪ TRANG CHỦ ===== */
+        .dropdown-custom { position: relative; }
+        .dropdown-custom .dropdown-menu {
+            position: absolute; top: 100%; left: 0; background: #e9e4dd; 
+            border-radius: 14px; padding: 12px 0; min-width: 240px; border: none;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15); opacity: 0; visibility: hidden;
+            transform: translateY(10px); transition: 0.3s; z-index: 999;
+        }
+        .dropdown-custom .dropdown-menu li a {
+            display: block; padding: 10px 20px; color: #2c5c7c !important; 
+            font-weight: 500; border-radius: 8px; margin: 2px 10px; transition: 0.3s;
+        }
+        .dropdown-custom .dropdown-menu li a:hover { background: #dcd6ce; color: #e74c3c !important; }
+        .dropdown-custom:hover .dropdown-menu { opacity: 1; visibility: visible; transform: translateY(0); display: block; }
+        
+        .badge { padding: 3px 6px; border-radius: 50%; font-family: sans-serif; }
+        .nav i.fa { margin-right: 5px; font-size: 16px; }
+
+        /* ===== FIX BANNER KHÔNG KHOẢNG TRẮNG ===== */
+        body { padding-top: 70px; } /* Đẩy nội dung xuống dưới menu cố định */
+        
+        #reservation .featured.background_content {
+            margin-top: -70px; /* Bù lại padding-top của body để ảnh sát mép trên */
+            padding: 100px 0; /* Tăng độ dày cho banner */
+            background-size: cover;
+            background-position: center;
+        }
+
+        /* ===== CSS CHO FORM ĐẶT BÀN ===== */
         .reservation-section { background-color: #ffffff; padding-bottom: 60px; }
         .form-container-custom { max-width: 900px; margin: 40px auto; padding: 30px; background: #fff; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
         .form-title { font-family: 'Playball', cursive; color: #d9534f; font-size: 32px; text-align: center; margin-bottom: 30px; }
         .label-custom { font-weight: 600; color: #444; margin-top: 15px; display: block; margin-bottom: 8px; }
         .input-custom { height: 45px !important; border: 1px solid #ddd !important; border-radius: 5px !important; }
+        
         .table-selection-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; margin-bottom: 25px; }
         .table-item input[type="radio"] { display: none; }
         .table-item label { display: block; padding: 12px; border: 2px solid #eee; border-radius: 6px; text-align: center; cursor: pointer; transition: 0.2s; font-weight: 500; color: #666; }
         .table-item input[type="radio"]:checked + label { border-color: #d9534f; background-color: #d9534f; color: white; }
+        
         .btn-reserve { background-color: #d9534f; color: white; padding: 14px; border: none; border-radius: 6px; width: 100%; font-size: 18px; font-weight: bold; text-transform: uppercase; margin-top: 20px; }
-        .btn-food-select { background: white; color: #d9534f; border: 1px solid #d9534f; width: 100%; padding: 10px; margin: 10px 0; font-weight: 600; border-radius: 6px; }
+        .btn-food-select { background: white; color: #d9534f; border: 1px solid #d9534f; width: 100%; padding: 12px; margin: 10px 0; font-weight: 600; border-radius: 6px; }
+
+        /* Menu Grid Modal */
+        .search-container { position: sticky; top: -15px; background: white; padding: 15px 0; z-index: 10; border-bottom: 1px solid #eee; margin-bottom: 20px; }
+        .search-input { width: 100%; padding: 10px 20px; border: 2px solid #ddd; border-radius: 25px; outline: none; }
+        .category-divider { background: #fcf8f2; padding: 10px 15px; margin: 20px 0 15px 0; border-left: 5px solid #d9534f; font-weight: bold; color: #d9534f; }
+        .menu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; }
+        .menu-card { border: 1px solid #eee; border-radius: 10px; overflow: hidden; display: flex; flex-direction: column; background: #fff;}
+        .card-img { width: 100%; height: 160px; object-fit: cover; }
+        .card-body { padding: 15px; flex-grow: 1; }
+        .btn-add-card { background: #d9534f; color: white; border: none; padding: 8px; border-radius: 5px; width: 100%; }
+
         .cart-wrapper { background: #fdfaf9; padding: 15px; border-radius: 6px; border: 1px dashed #d9534f; margin-bottom: 20px; }
-        .menu-item, .cart-item { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #eee; }
-        .item-info { display: flex; align-items: center; gap: 15px; }
-        .item-img { width: 65px; height: 65px; object-fit: cover; border-radius: 8px; border: 1px solid #ddd; }
-        .item-details h4 { margin: 0 0 5px 0; font-size: 16px; font-weight: 600; color: #333; }
-        .item-price { color: #d9534f; font-weight: bold; }
-        .btn-add-cart { background-color: #5cb85c; color: white; border: none; padding: 6px 12px; border-radius: 4px; }
-        .btn-remove-cart { background-color: #d9534f; color: white; border: none; padding: 4px 8px; border-radius: 4px; }
-        .qty-btn { background: #fff; border: 1px solid #ccc; width: 25px; height: 25px; border-radius: 4px; }
+        .cart-item { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee; }
+        .cart-item-img { width: 50px; height: 50px; border-radius: 5px; object-fit: cover; }
     </style>
 </head>
 <body>
 
     <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
         <div class="container">
-            <div class="navbar-header">
-                <a class="navbar-brand" href="#">Restaurant</a>
-            </div>
-            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-                <ul class="nav navbar-nav main-nav clear navbar-right">
-                    <li><a class="color_animation" href="{{ url('/') }}">Trang chủ</a></li>
-                    <li><a class="navactive color_animation" href="{{ url('/reservation') }}">Đặt bàn</a></li>
-                </ul>
+            <div class="row">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="#">Restaurant</a>
+                </div>
+
+                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                    <ul class="nav navbar-nav main-nav clear navbar-right">
+                        <li><a class="color_animation" href="{{ url('/') }}">Trang chủ</a></li>
+                        <li class="dropdown-custom">
+                            <a class="color_animation" href="#">Thực đơn</a>
+                        </li>
+                        <li><a class="navactive color_animation" href="{{ url('/reservation') }}">Đặt bàn</a></li>
+
+                        <li>
+                            <a class="color_animation" href="{{ url('/cart') }}" style="position: relative;">
+                                <i class="fa fa-shopping-cart"></i>
+                                <span class="badge" id="nav-cart-count" style="background: #96E16B; color: #000; position: absolute; top: 0; right: 0; font-size: 10px; display: none;">0</span>
+                            </a>
+                        </li>
+
+                        @guest
+                            <li><a class="color_animation" href="{{ route('login') }}">Đăng nhập</a></li>
+                            <li><a class="color_animation" href="{{ route('register') }}">Đăng ký</a></li>
+                        @endguest
+
+                        @auth
+                            <li class="dropdown-custom">
+                                <a class="color_animation" href="#">
+                                    <i class="fa fa-user"></i> {{ Auth::user()->name }}
+                                </a>
+                                <ul class="dropdown-menu">
+                                    @if(Auth::user()->role == 'admin')
+                                        <li><a href="{{ url('/admin') }}">Quản trị viên</a></li>
+                                    @endif
+                                    <li><a href="{{ url('/profile') }}">Hồ sơ của tôi</a></li>
+                                    <li>
+                                        <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" style="color: #e74c3c !important;">
+                                            <i class="fa fa-sign-out"></i> Đăng xuất
+                                        </a>
+                                        <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                                            @csrf
+                                        </form>
+                                    </li>
+                                </ul>
+                            </li>
+                        @endauth
+                    </ul>
+                </div>
             </div>
         </div>
     </nav>
@@ -68,11 +148,6 @@
 
                     <form id="contact-us" method="post" action="{{ route('reservation.store') }}">
                         @csrf
-                        
-                        @if(session('success'))
-                            <div class="alert alert-success">{{ session('success') }}</div>
-                        @endif
-
                         <div class="row">
                             <div class="col-md-6">
                                 <label class="label-custom">Ngày đặt bàn</label>
@@ -105,14 +180,14 @@
 
                         <label class="label-custom">Thực đơn đặt trước</label>
                         <button type="button" class="btn-food-select" data-toggle="modal" data-target="#foodMenuModal">
-                            <i class="fa fa-cutlery"></i> XEM MENU VÀ CHỌN MÓN ĂN
+                            <i class="fa fa-search"></i> TÌM KIẾM VÀ CHỌN MÓN ĂN
                         </button>
 
                         <div id="cart-container" class="cart-wrapper" style="display: none;">
                             <h5 class="label-custom" style="margin-top: 0; color: #d9534f;">Món ăn đã chọn:</h5>
                             <div id="cart-list"></div>
                             <div class="cart-total text-right" style="margin-top: 15px;">
-                                <strong>Tổng cộng: <span id="total-price">0</span> VNĐ</strong>
+                                <strong style="font-size: 16px;">Tổng cộng: <span id="total-price" style="color: #d9534f;">0</span> VNĐ</strong>
                             </div>
                             <div id="hidden-inputs-container"></div>
                         </div>
@@ -128,106 +203,102 @@
     </section>
 
     <div id="foodMenuModal" class="modal fade" role="dialog">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
-                    <h4 class="modal-title">Thực Đơn (Theo Seeder)</h4>
+                    <h4 class="modal-title">Thực Đơn Nhà Hàng</h4>
                 </div>
-                <div class="modal-body" style="max-height: 450px; overflow-y: auto;">
+                <div class="modal-body" style="max-height: 600px; overflow-y: auto;">
+                    <div class="search-container">
+                        <input type="text" id="menuSearch" class="search-input" placeholder="Nhập tên món ăn..." onkeyup="filterMenu()">
+                    </div>
                     <div id="menu-list"></div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Hoàn tất</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Xong</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <script type="text/javascript" src="{{ asset('js/jquery-1.10.2.min.js') }}"></script>
-    <script type="text/javascript" src="{{ asset('js/bootstrap.min.js') }}"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="{{ asset('js/bootstrap.min.js') }}"></script>
 
     <script>
-    // 1. ĐỒNG BỘ DỮ LIỆU TỪ SESSION PHP SANG JAVASCRIPT KHI LOAD TRANG
+    $(document).ready(function () {
+        // Tự động thêm Dropdown Thực đơn giống trang chủ
+        $('.navbar-nav li a').each(function () {
+            if ($(this).text().trim() === 'Thực đơn') {
+                let parent = $(this).parent();
+                if (parent.find('.dropdown-menu').length === 0) {
+                    let dropdown = `
+                    <ul class="dropdown-menu">
+                        <li><a href="{{ url('/menu') }}">Thực đơn chi tiết</a></li>
+                        <li><a href="{{ url('/seafood') }}">Hải sản</a></li>
+                        <li><a href="{{ url('/special') }}">Món đặc biệt</a></li>
+                        <li><a href="{{ url('/salad') }}">Salad</a></li>
+                        <li><a href="{{ url('/vietnamese') }}">Món Việt</a></li>
+                        <li><a href="{{ url('/desserts') }}">Tráng miệng</a></li>
+                        <li><a href="{{ url('/drinks') }}">Thức uống</a></li>
+                    </ul>`;
+                    parent.append(dropdown);
+                }
+            }
+        });
+
+        renderMenu();
+    });
+
     const menuItems = @json($menus); 
-    // Tìm đoạn này trong <script> của bạn:
-let cart = [
-    @if(isset($cart) && is_array($cart)) // Thêm kiểm tra này
-        @foreach($cart as $id => $item)
-        {
-            id: {{ $id }},
-            name: "{{ $item['name'] }}",
-            price: {{ $item['price'] }},
-            image: "{{ $item['image'] }}",
-            quantity: {{ $item['quantity'] }}
-        },
-        @endforeach
-    @endif
-];
+    let cart = [];
 
     const formatCurrency = (num) => new Intl.NumberFormat('vi-VN').format(num);
 
-    function renderMenu() {
+    function renderMenu(filter = '') {
+        const listElement = document.getElementById('menu-list');
+        const groups = menuItems.reduce((acc, item) => {
+            const cat = item.category || 'Món khác';
+            if (!acc[cat]) acc[cat] = [];
+            acc[cat].push(item);
+            return acc;
+        }, {});
+
         let html = '';
-        menuItems.forEach(item => {
-            html += `
-                <div class="menu-item">
-                    <div class="item-info">
-                        <img src="{{ asset('') }}${item.image}" alt="${item.name}" class="item-img" onerror="this.src='https://via.placeholder.com/65'">
-                        <div class="item-details">
-                            <h4>${item.name}</h4>
-                            <small>${item.category} - ${item.description}</small><br>
-                            <span class="item-price">${formatCurrency(item.price)} VNĐ</span>
-                        </div>
-                    </div>
-                    <button type="button" class="btn-add-cart" onclick="addToCart(${item.id})">Chọn</button>
-                </div>`;
-        });
-        document.getElementById('menu-list').innerHTML = html;
+        for (const category in groups) {
+            const filteredItems = groups[category].filter(item => item.name.toLowerCase().includes(filter.toLowerCase()));
+            if (filteredItems.length > 0) {
+                html += `<div class="category-divider">${category}</div><div class="menu-grid">`;
+                filteredItems.forEach(item => {
+                    html += `
+                        <div class="menu-card">
+                            <img src="{{ asset('') }}${item.image}" alt="${item.name}" class="card-img" onerror="this.src='https://via.placeholder.com/200x160'">
+                            <div class="card-body">
+                                <h4 class="card-title" style="font-size:15px; height:40px; overflow:hidden;">${item.name}</h4>
+                                <span class="card-price" style="color:#d9534f; font-weight:bold;">${formatCurrency(item.price)} VNĐ</span>
+                                <button type="button" class="btn-add-card" onclick="addToCart(${item.id})" style="margin-top:10px;">Chọn</button>
+                            </div>
+                        </div>`;
+                });
+                html += `</div>`;
+            }
+        }
+        listElement.innerHTML = html || '<p class="text-center">Không tìm thấy món ăn.</p>';
     }
 
-    // 2. GỬI AJAX KHI THÊM MÓN ĐỂ KIỂM TRA STOCK VÀ LƯU SESSION
     function addToCart(id) {
-        $.ajax({
-            url: "{{ route('cart.add') }}", // Đảm bảo route này khớp với file web.php
-            method: "POST",
-            data: {
-                _token: "{{ csrf_token() }}",
-                menu_id: id,
-                quantity: 1
-            },
-            success: function(response) {
-                const item = menuItems.find(i => i.id === id);
-                const existing = cart.find(i => i.id === id);
-                if (existing) {
-                    existing.quantity += 1;
-                } else {
-                    cart.push({ ...item, quantity: 1 });
-                }
-                updateCartUI();
-            },
-            error: function(xhr) {
-                // Hiển thị lỗi nếu hết hàng (Lỗi 400 từ Controller)
-                alert(xhr.responseJSON.error || "Có lỗi xảy ra khi thêm món.");
-            }
-        });
+        const item = menuItems.find(i => i.id === id);
+        const existing = cart.find(i => i.id === id);
+        if (existing) { existing.quantity += 1; } else { cart.push({ ...item, quantity: 1 }); }
+        updateCartUI();
     }
 
     function updateQuantity(id, change) {
         const index = cart.findIndex(i => i.id === id);
         if (index > -1) {
-            const newQty = cart[index].quantity + change;
-            
-            // Nếu giảm về 0 thì xóa, nếu tăng thì vẫn nên check qua AJAX hoặc logic local
-            if (newQty <= 0) {
-                cart.splice(index, 1);
-                // Bạn có thể thêm 1 route AJAX để xóa item khỏi session ở đây nếu cần
-                updateCartUI();
-            } else {
-                // Cập nhật tạm thời trên UI, session sẽ được cập nhật khi nhấn đặt bàn hoặc qua AJAX thêm
-                cart[index].quantity = newQty;
-                updateCartUI();
-            }
+            cart[index].quantity += change;
+            if (cart[index].quantity <= 0) cart.splice(index, 1);
+            updateCartUI();
         }
     }
 
@@ -235,53 +306,46 @@ let cart = [
         const container = document.getElementById('cart-container');
         const list = document.getElementById('cart-list');
         const hidden = document.getElementById('hidden-inputs-container');
-        let total = 0, cartHtml = '', inputsHtml = '';
+        const navCount = document.getElementById('nav-cart-count');
+        
+        let total = 0, cartHtml = '', inputsHtml = '', totalQty = 0;
 
-        if (cart.length === 0) {
-            container.style.display = 'none';
-        } else {
-            container.style.display = 'block';
-            cart.forEach(item => {
-                total += item.price * item.quantity;
-                
-                cartHtml += `
-                    <div class="cart-item" style="display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee;">
-                        <div style="display: flex; align-items: center; gap: 12px;">
-                            <img src="{{ asset('') }}${item.image}" alt="${item.name}" 
-                                 style="width: 45px; height: 45px; object-fit: cover; border-radius: 5px; border: 1px solid #ddd;"
-                                 onerror="this.src='https://via.placeholder.com/45'">
-                            <div>
-                                <strong style="display: block; font-size: 14px;">${item.name}</strong>
-                                <span style="font-size: 12px; color: #888;">${formatCurrency(item.price)} VNĐ</span>
-                            </div>
-                        </div>
-                        
-                        <div class="qty-control" style="display: flex; align-items: center; gap: 8px;">
-                            <button type="button" class="qty-btn" onclick="updateQuantity(${item.id}, -1)">-</button>
-                            <span style="min-width: 20px; text-align: center; font-weight: bold;">${item.quantity}</span>
-                            <button type="button" class="qty-btn" onclick="updateQuantity(${item.id}, 1)">+</button>
-                            <span style="margin-left: 10px; font-weight: bold; min-width: 80px; text-align: right;">
-                                ${formatCurrency(item.price * item.quantity)}
-                            </span>
-                        </div>
-                    </div>`;
+        cart.forEach(item => {
+            total += item.price * item.quantity;
+            totalQty += item.quantity;
+            cartHtml += `
+                <div class="cart-item">
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <img src="{{ asset('') }}${item.image}" class="cart-item-img" onerror="this.src='https://via.placeholder.com/50'">
+                        <div><strong>${item.name}</strong><br><small>${formatCurrency(item.price)} VNĐ</small></div>
+                    </div>
+                    <div>
+                        <button type="button" class="btn btn-xs btn-default" onclick="updateQuantity(${item.id}, -1)">-</button>
+                        <span style="margin:0 5px; font-weight:bold;">${item.quantity}</span>
+                        <button type="button" class="btn btn-xs btn-default" onclick="updateQuantity(${item.id}, 1)">+</button>
+                    </div>
+                </div>`;
+            inputsHtml += `<input type="hidden" name="foods[${item.id}][id]" value="${item.id}"><input type="hidden" name="foods[${item.id}][quantity]" value="${item.quantity}">`;
+        });
 
-                // Quan trọng: Phải khớp name với Controller xử lý (ví dụ: foods hoặc menu_items)
-                inputsHtml += `
-                    <input type="hidden" name="foods[${item.id}][id]" value="${item.id}">
-                    <input type="hidden" name="foods[${item.id}][quantity]" value="${item.quantity}">`;
-            });
-        }
+        container.style.display = cart.length > 0 ? 'block' : 'none';
         list.innerHTML = cartHtml;
         hidden.innerHTML = inputsHtml;
+        
+        // Cập nhật Badge trên Menu
+        if(totalQty > 0) {
+            navCount.innerText = totalQty;
+            navCount.style.display = 'block';
+        } else {
+            navCount.style.display = 'none';
+        }
+        
         document.getElementById('total-price').innerText = formatCurrency(total);
     }
 
-    // 3. KHI TRANG SẴN SÀNG: RENDER MENU VÀ HIỂN THỊ LẠI GIỎ HÀNG TỪ SESSION
-    $(document).ready(() => {
-        renderMenu();
-        updateCartUI(); 
-    });
-</script>
+    function filterMenu() {
+        renderMenu(document.getElementById('menuSearch').value);
+    }
+    </script>
 </body>
 </html>

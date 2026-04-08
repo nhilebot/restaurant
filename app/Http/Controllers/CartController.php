@@ -9,16 +9,16 @@ use Illuminate\Support\Facades\DB;
 
 class CartController extends Controller
 {
-    // 1. Hiển thị trang Giỏ hàng (Sửa lỗi hiển thị Bàn, Ngày, Trạng thái)
+    // 1. Hiển thị trang Giỏ hàng
     public function index()
     {
         $cart = session()->get('cart', []);
         
-        // Lấy thông tin đặt bàn từ session
+        // Lấy thông tin đặt bàn từ session (Ưu tiên format ngày giờ H:i)
         $reservation = session()->get('reservation_info', [
-            'date' => date('d/m/Y'), 
+            'date' => date('d/m/Y H:i'), 
             'table' => 'Chưa chọn',
-            'status' => 'Đang chờ thanh toán',
+            'status' => 'chờ xác nhận',
             'name' => 'Khách vãng lai',
             'phone' => 'Chưa có',
             'notes' => ''
@@ -32,15 +32,15 @@ class CartController extends Controller
         return view('cart.index', compact('cart', 'total', 'reservation'));
     }
 
-    // 2. Thêm món vào giỏ hàng (AJAX) - Cập nhật thông tin bàn ngay lúc này
+    // 2. Thêm món vào giỏ hàng (AJAX) - Giữ nguyên phần Tâm đã vá lỗi ID
     public function addToCartAjax(Request $request)
     {
         $id = $request->input('menu_id');
         $quantity = $request->input('quantity', 1);
         
-        // Lưu thông tin bàn/ngày vào session để dùng cho trang giỏ hàng
+        // Cập nhật thông tin bàn ngay lúc thêm món
         session()->put('reservation_info', [
-            'date' => $request->input('reservation_date', date('d/m/Y')),
+            'date' => $request->input('reservation_date', date('d/m/Y H:i')),
             'table' => $request->input('table_id', 'Chưa chọn'),
             'status' => 'Đang xử lý'
         ]);
@@ -57,7 +57,7 @@ class CartController extends Controller
             $cart[$id]['quantity'] += $quantity;
         } else {
             $cart[$id] = [
-                "id" => $id, // ĐÂY LÀ DÒNG TÂM THÊM VÀO ĐỂ VÁ LỖI NÈ
+                "id" => $id, // ID cực kỳ quan trọng để lưu vào chi tiết đơn hàng
                 "name" => $menu->name,
                 "quantity" => $quantity,
                 "price" => $menu->price,
@@ -67,31 +67,21 @@ class CartController extends Controller
 
         session()->put('cart', $cart);
 
-        $total = 0;
-        foreach($cart as $item) {
-            $total += ($item['price'] ?? 0) * ($item['quantity'] ?? 0);
-        }
-
         return redirect()->back()->with('success', 'Đã thêm món vào giỏ hàng!');
     }
 
-    // 3. Xóa giỏ hàng (Sửa lỗi Route cart.clear)
+    // 3. Xóa giỏ hàng
     public function clear()
     {
         session()->forget(['cart', 'reservation_info']);
         return redirect()->route('reservation.index')->with('success', 'Đã hủy giỏ hàng!');
     }
 
-    // 4. Thanh toán: Đẩy dữ liệu từ Session vào Database
-    // 4. Thanh toán: Đẩy dữ liệu từ Session vào Database (Tâm đã nâng cấp)
+    // 4. Thanh toán: Nâng cấp lưu Ghi chú và Phương thức thanh toán
     public function checkout(Request $request)
     {
-        // Bắt buộc khách phải nhập đủ thông tin mới cho qua
-        $request->validate([
-            'name' => 'required',
-            'phone' => 'required',
-            'address' => 'required'
-        ]);
+        // Nếu bạn muốn bắt buộc nhập tên/sdt thì dùng validate ở đây
+        // $request->validate(['name' => 'required', 'phone' => 'required']);
 
         $cart = session()->get('cart', []);
         $reservation = session()->get('reservation_info');
@@ -107,35 +97,36 @@ class CartController extends Controller
 
         try {
             DB::transaction(function () use ($cart, $reservation, $total, $request) {
-                // Lưu vào bảng orders kèm thông tin Tâm vừa thêm
+                // Tạo đơn hàng mới với đầy đủ thông tin Ghi chú & Thanh toán
                 $order = Order::create([
                     'user_id'      => auth()->check() ? auth()->id() : null,
                     'table_number' => $reservation['table'] ?? 'Chưa chọn',
                     'total_price'  => $total,
-                    'status'       => 'đã thanh toán',
-                    'name'         => $request->name,     // Hứng Tên
-                    'phone'        => $request->phone,    // Hứng Số điện thoại
-                    'address'      => $request->address   // Hứng Địa chỉ
+                    'status'       => 'đang xử lý',
+                    'name'         => $request->name ?? ($reservation['name'] ?? 'Khách vãng lai'),
+                    'phone'        => $request->phone ?? ($reservation['phone'] ?? 'Chưa có'),
+                    'address'      => $request->address ?? 'Tại nhà hàng',
+                    'notes'        => $request->order_notes, // Hứng từ textarea name="order_notes"
+                    'payment_method' => $request->payment_method // Hứng từ radio button
                 ]);
 
-                // Lưu chi tiết từng món
+                // Lưu chi tiết từng món vào bảng order_items
                 foreach ($cart as $item) {
                     $order->orderItems()->create([
-                        'product_id'   => $item['id'] ?? null,
-                        'product_name' => $item['name'] ?? 'Món ăn',
-                        'quantity'     => $item['quantity'] ?? 0,
-                        'price'        => $item['price'] ?? 0,
+                        'product_id'   => $item['id'],
+                        'product_name' => $item['name'],
+                        'quantity'     => $item['quantity'],
+                        'price'        => $item['price'],
                     ]);
                 }
             });
 
+            // Xóa sạch session sau khi chốt đơn thành công
             session()->forget(['cart', 'reservation_info']);
-            return redirect()->route('reservation.index')->with('success', 'Chốt đơn thành công! Cảm ơn bạn.');
+            return redirect()->route('reservation.index')->with('success', 'Đơn hàng của bạn đã được gửi thành công!');
 
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Lỗi khi lưu dữ liệu: ' . $e->getMessage());
         }
-        
-    } // <--- Tâm gõ thêm dấu này để đóng hàm checkout() lại
-
-} // <--- Tâm gõ thêm dấu này để đóng toàn bộ file CartController lại
+    }
+}
