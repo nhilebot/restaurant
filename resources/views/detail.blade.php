@@ -86,7 +86,13 @@
                             <span style="background: #fff5f5; padding: 7px 20px; border: 1px solid #ddd; display: inline-block;">100</span>
                         </div>
                     </div>
+                  <div style="display: flex; gap: 10px;">
                     <button type="submit" class="btn-order">Thêm Vào Giỏ Hàng</button>
+
+                    <a href="{{ url('/') }}" class="btn-order" style="background-color: #6c757d; text-decoration: none; display: flex; align-items: center; justify-content: center;">
+                        🏠 Về Trang Chủ
+                    </a>
+                </div>
                 </form>
             @else
                 <div class="quantity-row">

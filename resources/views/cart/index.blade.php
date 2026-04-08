@@ -84,6 +84,23 @@
             <div class="clearfix">
                 <form action="{{ route('cart.checkout') }}" method="POST">
     @csrf
+    @if(session('error'))
+        <div style="background: #ffe6e6; color: #d9534f; padding: 15px; border-radius: 5px; margin-bottom: 20px; border: 1px solid #d9534f;">
+            <strong>⚠️ HỆ THỐNG BÁO LỖI:</strong> {{ session('error') }}
+        </div>
+    @endif
+
+    @if($errors->any())
+        <div style="background: #ffe6e6; color: #d9534f; padding: 15px; border-radius: 5px; margin-bottom: 20px; border: 1px solid #d9534f;">
+            <strong>⚠️ BẠN NHẬP THIẾU THÔNG TIN:</strong>
+            <ul style="margin-bottom: 0;">
+                @foreach($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+    <form action="{{ route('cart.checkout') }}" method="POST">
     
     <div style="background: #fff; padding: 20px; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 20px; text-align: left;">
         <h5 style="color: #d9534f; font-weight: bold; margin-bottom: 15px;"><i class="fa fa-user"></i> Thông tin giao hàng</h5>
@@ -103,9 +120,40 @@
             </div>
         </div>
     </div>
-    <button type="submit" class="btn-checkout"><i class="fa fa-check-circle"></i> XÁC NHẬN THANH TOÁN</button>
-</form>
-            </div>
+    
+<div style="margin-top: 20px; padding: 15px; border: 1px solid #ddd; border-radius: 8px; background-color: #fff;">
+    <label style="font-weight: bold; font-size: 16px; margin-bottom: 15px; display: block; color: #2c5c7c;">
+        💳 Chọn phương thức thanh toán
+    </label>
+
+    <div style="margin-bottom: 12px; display: flex; align-items: center;">
+        <input type="radio" id="cod" name="payment_method" value="COD" checked onclick="document.getElementById('qr-code-box').style.display='none'" style="width: 18px; height: 18px; margin-right: 10px; cursor: pointer;">
+        <label for="cod" style="cursor: pointer; margin: 0; font-size: 15px;">
+            💵 Thanh toán tiền mặt khi nhận hàng (COD)
+        </label>
+    </div>
+
+    <div style="display: flex; align-items: center;">
+        <input type="radio" id="banking" name="payment_method" value="Banking" onclick="document.getElementById('qr-code-box').style.display='block'" style="width: 18px; height: 18px; margin-right: 10px; cursor: pointer;">
+        <label for="banking" style="cursor: pointer; margin: 0; font-size: 15px;">
+            🏦 Chuyển khoản ngân hàng / MoMo
+        </label>
+    </div>
+
+    <div id="qr-code-box" style="display: none; margin-top: 15px; text-align: center; border-top: 1px dashed #ccc; padding-top: 15px;">
+        <p style="color: #e74c3c; font-weight: bold; margin-bottom: 10px;">Quét mã QR dưới đây để thanh toán:</p>
+        
+        <img src="{{ asset('images/qr-bank.jpg') }}" alt="Mã QR Thanh Toán" style="width: 200px; max-width: 100%; border-radius: 8px; border: 2px solid #2c5c7c; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+        
+        <p style="font-size: 13px; color: #666; margin-top: 10px; font-style: italic;">
+            (Vui lòng ghi chú: Tên + SĐT của bạn khi chuyển khoản)
+        </p>
+    </div>
+</div>
+<br>
+<div style="display: flex; justify-content: center; width: 100%; margin-top: 20px;">
+    <button type="submit" class="btn-checkout" style="padding: 12px 30px; font-size: 16px;"><i class="fa fa-check-circle"></i> XÁC NHẬN THANH TOÁN</button>
+</div>            </div>
         @endif
     </div>
 </div>

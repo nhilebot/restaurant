@@ -118,7 +118,7 @@ class CartController extends Controller
                 // Lưu chi tiết từng món
                 foreach ($cart as $item) {
                     $order->orderItems()->create([
-                        'menu_id'      => $item['id'],
+                        'product_id'   => $item['id'],
                         'product_name' => $item['name'],
                         'quantity'     => $item['quantity'],
                         'price'        => $item['price'],
