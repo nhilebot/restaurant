@@ -128,6 +128,7 @@
                             @endforeach
                         </td>
 
+<<<<<<< Updated upstream
                         <!-- NGÀY -->
                         <td style="vertical-align: middle;">
                             {{ $reservation['date'] }}
@@ -145,6 +146,17 @@
                                 Bàn {{ $reservation['table'] }}
                             </span>
                         </td>
+=======
+                            <td style="vertical-align: middle;">{{ $reservation['date'] ?? date('d/m/Y') }}</td>
+
+                            <td style="vertical-align: middle;" class="status-text">{{ $reservation['status'] ?? 'Đang chờ thanh toán' }}</td>
+
+                            <td style="vertical-align: middle;" class="text-center">
+                                <span class="badge badge-danger" style="background-color: #d9534f; padding: 8px 12px;">
+                                    Bàn {{ $reservation['table'] ?? 'Chưa chọn' }}
+                                </span>
+                            </td>
+>>>>>>> Stashed changes
 
                         <!-- TỔNG TIỀN -->
                         <td style="vertical-align: middle; font-weight: bold;">
@@ -213,14 +225,86 @@
                 </div>
             </div>
 
+<<<<<<< Updated upstream
             <div style="text-align:center; margin-top:20px;">
                 <button type="submit" class="btn-checkout">
                     XÁC NHẬN THANH TOÁN
                 </button>
             </div>
+=======
+            <div class="clearfix">
+                <form action="{{ route('cart.checkout') }}" method="POST">
+                    @csrf
+                    @if(session('error'))
+                        <div style="background: #ffe6e6; color: #d9534f; padding: 15px; border-radius: 5px; margin-bottom: 20px; border: 1px solid #d9534f;">
+                            <strong>⚠️ HỆ THỐNG BÁO LỖI:</strong> {{ session('error') }}
+                        </div>
+                    @endif
+
+                    @if($errors->any())
+                        <div style="background: #ffe6e6; color: #d9534f; padding: 15px; border-radius: 5px; margin-bottom: 20px; border: 1px solid #d9534f;">
+                            <strong>⚠️ BẠN NHẬP THIẾU THÔNG TIN:</strong>
+                            <ul style="margin-bottom: 0;">
+                                @foreach($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+
+                    
+    
+<div style="margin-top: 20px; padding: 15px; border: 1px solid #ddd; border-radius: 8px; background-color: #fff;">
+    <label style="font-weight: bold; font-size: 16px; margin-bottom: 15px; display: block; color: #2c5c7c;">
+        💳 Chọn phương thức thanh toán
+    </label>
+>>>>>>> Stashed changes
 
         </form>
 
+<<<<<<< Updated upstream
+=======
+    <div style="display: flex; align-items: center;">
+        <input type="radio" id="banking" name="payment_method" value="Banking" onclick="document.getElementById('qr-code-box').style.display='block'" style="width: 18px; height: 18px; margin-right: 10px; cursor: pointer;">
+        <label for="banking" style="cursor: pointer; margin: 0; font-size: 15px;">
+            🏦 Chuyển khoản ngân hàng / MoMo
+        </label>
+    </div>
+
+    <div id="qr-code-box" style="display: none; margin-top: 15px; text-align: center; border-top: 1px dashed #ccc; padding-top: 15px;">
+        <p style="color: #e74c3c; font-weight: bold; margin-bottom: 10px;">Quét mã QR dưới đây để thanh toán:</p>
+        
+        
+        @php
+        // Tính tổng tiền từ Giỏ hàng
+        $cart = session()->get('cart', []);
+        $totalAmount = 0;
+        foreach($cart as $item) {
+            $totalAmount += $item['price'] * $item['quantity'];
+        }
+        
+        // THÔNG TIN NGÂN HÀNG CỦA NÝ
+        $bankID = 'MB'; // Nếu xài ngân hàng khác thì đổi chữ MB thành VCB, TCB, ACB, VIB...
+        $accountNo = '0704409810'; 
+        $memo = 'Thanh toan ban ' . session('table_number', 'Mang ve');
+    @endphp
+
+    <img src="https://img.vietqr.io/image/{{ $bankID }}-{{ $accountNo }}-compact2.png?amount={{ $totalAmount }}&addInfo={{ urlencode($memo) }}" 
+         alt="Mã QR Thanh Toán" 
+         style="width: 250px; max-width: 100%; border-radius: 8px; border: 1px solid #ccc;">
+
+    <p style="font-size: 16px; color: #e74c3c; margin-top: 15px; font-weight: bold;">
+        Số tiền cần chuyển: {{ number_format($totalAmount, 0, ',', '.') }} VNĐ
+    </p>
+    </div>
+</div>
+<br>
+<div style="display: flex; justify-content: center; width: 100%; margin-top: 20px;">
+    <button type="submit" class="btn-checkout" style="padding: 12px 30px; font-size: 16px;"><i class="fa fa-check-circle"></i> XÁC NHẬN THANH TOÁN</button>
+</div>
+                </form>
+            </div>
+>>>>>>> Stashed changes
         @endif
 
     </div>
