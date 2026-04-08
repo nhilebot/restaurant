@@ -20,8 +20,9 @@ class User extends Authenticatable
     protected $fillable = [
     'name',
     'email',
+    'phone',
     'password',
-    'role', // Phải có trường này ở đây
+    'role' => 'customer', // Phải có trường này ở đây
 ];
 
     /**
