@@ -43,6 +43,7 @@ class ReservationController extends Controller
             'table_number' => 'required|string',
             'menu_items'   => 'required|array|min:1',
         ]);
+        session()->put('table_number', $request->table_number);
 
         // 2. Lọc các món được chọn hợp lệ
         $selectedItems = collect($request->menu_items)->filter(function ($item) {
