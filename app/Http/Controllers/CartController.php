@@ -26,7 +26,7 @@ class CartController extends Controller
 
         $total = 0;
         foreach($cart as $item) {
-            $total += $item['price'] * $item['quantity'];
+            $total += ($item['price'] ?? 0) * ($item['quantity'] ?? 0);
         }
 
         return view('cart.index', compact('cart', 'total', 'reservation'));
@@ -69,7 +69,7 @@ class CartController extends Controller
 
         $total = 0;
         foreach($cart as $item) {
-            $total += $item['price'] * $item['quantity'];
+            $total += ($item['price'] ?? 0) * ($item['quantity'] ?? 0);
         }
 
         return redirect()->back()->with('success', 'Đã thêm món vào giỏ hàng!');
@@ -102,7 +102,7 @@ class CartController extends Controller
 
         $total = 0;
         foreach ($cart as $item) {
-            $total += $item['price'] * $item['quantity'];
+            $total += ($item['price'] ?? 0) * ($item['quantity'] ?? 0);
         }
 
         try {
@@ -121,10 +121,10 @@ class CartController extends Controller
                 // Lưu chi tiết từng món
                 foreach ($cart as $item) {
                     $order->orderItems()->create([
-                        'product_id'   => $item['id'],
-                        'product_name' => $item['name'],
-                        'quantity'     => $item['quantity'],
-                        'price'        => $item['price'],
+                        'product_id'   => $item['id'] ?? null,
+                        'product_name' => $item['name'] ?? 'Món ăn',
+                        'quantity'     => $item['quantity'] ?? 0,
+                        'price'        => $item['price'] ?? 0,
                     ]);
                 }
             });

@@ -44,10 +44,10 @@
                             <td>
                                 @foreach($cart as $item)
                                     <div class="item-row">
-                                        <img src="{{ asset($item['image']) }}" class="item-img-mini" onerror="this.src='https://via.placeholder.com/50'">
+                                        <img src="{{ asset($item['image'] ?? 'images/default.jpg') }}" class="item-img-mini" onerror="this.src='https://via.placeholder.com/50'">
                                         <div>
-                                            <div style="font-weight: 600; font-size: 14px;">{{ $item['name'] }} ({{ $item['quantity'] }})</div>
-                                            <small class="text-muted">{{ number_format($item['price'], 0, ',', '.') }} VNĐ</small>
+                                            <div style="font-weight: 600; font-size: 14px;">{{ $item['name'] ?? 'Món ăn' }} ({{ $item['quantity'] ?? 0 }})</div>
+                                            <small class="text-muted">{{ number_format($item['price'] ?? 0, 0, ',', '.') }} VNĐ</small>
                                         </div>
                                     </div>
                                 @endforeach
@@ -83,11 +83,11 @@
         @if(count($cart) > 0)
             <div class="reservation-info" style="background: #fff; padding: 18px; border: 1px solid #eee; border-radius: 10px; margin-bottom: 20px;">
                 <h5 style="margin-top: 0; color: #d9534f; font-weight: bold;">Thông tin đặt bàn</h5>
-                <p style="margin-bottom: 8px;"><strong>Khách hàng:</strong> {{ $reservation['name'] }}</p>
-                <p style="margin-bottom: 8px;"><strong>Số điện thoại:</strong> {{ $reservation['phone'] }}</p>
-                <p style="margin-bottom: 8px;"><strong>Ngày/giờ:</strong> {{ $reservation['date'] }}</p>
-                <p style="margin-bottom: 8px;"><strong>Bàn:</strong> Bàn {{ $reservation['table'] }}</p>
-                <p style="margin-bottom: 0;"><strong>Ghi chú:</strong> {{ $reservation['notes'] ?: 'Không có' }}</p>
+                <p style="margin-bottom: 8px;"><strong>Khách hàng:</strong> {{ $reservation['name'] ?? 'Khách vãng lai' }}</p>
+                <p style="margin-bottom: 8px;"><strong>Số điện thoại:</strong> {{ $reservation['phone'] ?? 'Chưa có' }}</p>
+                <p style="margin-bottom: 8px;"><strong>Ngày/giờ:</strong> {{ $reservation['date'] ?? date('d/m/Y') }}</p>
+                <p style="margin-bottom: 8px;"><strong>Bàn:</strong> Bàn {{ $reservation['table'] ?? 'Chưa chọn' }}</p>
+                <p style="margin-bottom: 0;"><strong>Ghi chú:</strong> {{ $reservation['notes'] ?? 'Không có' }}</p>
             </div>
 
             <div class="clearfix">
