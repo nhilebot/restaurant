@@ -2,113 +2,81 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Đơn hàng của bạn</title>
-
+    <title>Thanh Toán Bàn Của Bạn</title>
     <link rel="stylesheet" href="{{ asset('css/bootstrap.css') }}">
     <link href="{{ asset('css/font-awesome.min.css') }}" rel="stylesheet">
-
     <style>
-        body { background-color: #f8f9fa; padding: 50px 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        .order-container { background: #fff; padding: 30px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
-        .table-order thead { background-color: #f1f1f1; }
-        .table-order th { border: none; color: #555; text-transform: uppercase; font-size: 13px; }
-        .item-row { display: flex; align-items: center; margin-bottom: 10px; border-bottom: 1px dashed #eee; padding-bottom: 5px; }
-        .item-row:last-child { border-bottom: none; }
-        .item-img-mini { width: 50px; height: 50px; object-fit: cover; border-radius: 6px; margin-right: 12px; border: 1px solid #ddd; }
-        .status-text { color: #d9534f; font-weight: bold; text-transform: lowercase; }
-        .btn-checkout { background-color: #d9534f; color: white; padding: 12px 40px; border-radius: 25px; font-weight: bold; border: none; transition: 0.3s; font-size: 16px; }
-        .btn-checkout:hover { background-color: #c9302c; box-shadow: 0 5px 15px rgba(217, 83, 79, 0.3); transform: translateY(-2px); }
-        .btn-cancel { color: #d9534f; text-decoration: underline; font-size: 13px; }
-        .form-section { background: #fff; padding: 20px; border: 1px solid #eee; border-radius: 10px; margin-top: 20px; }
-        .section-title { font-weight: bold; font-size: 16px; color: #333; margin-bottom: 15px; display: block; }
+        body { background: #f8f9fa; padding: 40px 0; font-family: Arial, sans-serif; }
+        .box { background: #fff; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); max-width: 600px; margin: 0 auto; }
+        .item { display: flex; align-items: center; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 15px; }
+        .item img { width: 60px; height: 60px; margin-right: 15px; border-radius: 8px; object-fit: cover; }
+        .btn-main { background: #d9534f; color: #fff; border: none; padding: 12px 25px; border-radius: 30px; font-weight: bold; width: 100%; font-size: 16px; transition: 0.3s; }
+        .btn-main:hover { background: #c9302c; }
+        .qr-section { background: #fff5f5; border: 2px dashed #d9534f; border-radius: 10px; padding: 20px; text-align: center; margin-bottom: 20px; }
+        .info-box { background: #f4fdf8; border: 1px solid #c3e6cb; border-radius: 8px; padding: 15px; margin-bottom: 20px; color: #155724; }
     </style>
 </head>
-
 <body>
 <div class="container">
-    <div class="order-container">
-        <h3 class="mb-4" style="color: #333; font-weight: bold;">Đơn Hàng Của Bạn</h3>
-
-        <div class="table-responsive">
-            <table class="table table-bordered table-order">
-                <thead>
-                    <tr>
-                        <th width="40%">Món ăn</th>
-                        <th>Ngày</th>
-                        <th>Trạng thái</th>
-                        <th class="text-center">Bàn</th>
-                        <th>Tổng cộng</th>
-                        <th>Hành động</th>
-                    </tr>
-                </thead>
-                <tbody>
-                @if(count($cart) > 0)
-                    <tr>
-                        <td>
-                            @foreach($cart as $item)
-                                <div class="item-row">
-                                    <img src="{{ asset($item['image'] ?? 'images/default.jpg') }}" class="item-img-mini" onerror="this.src='https://via.placeholder.com/50'">
-                                    <div>
-                                        <div style="font-weight: 600;">{{ $item['name'] }} ({{ $item['quantity'] }})</div>
-                                        <small class="text-muted">{{ number_format($item['price'], 0, ',', '.') }} VNĐ</small>
-                                    </div>
-                                </div>
-                            @endforeach
-                        </td>
-                        <td style="vertical-align: middle;">{{ $reservation['date'] }}</td>
-                        <td style="vertical-align: middle;" class="status-text">{{ $reservation['status'] }}</td>
-                        <td style="vertical-align: middle;" class="text-center">
-                            <span class="badge" style="background-color: #d9534f; color: white; padding: 8px 12px;">Bàn {{ $reservation['table'] }}</span>
-                        </td>
-                        <td style="vertical-align: middle; font-weight: bold; color: #333; font-size: 16px;">
-                            {{ number_format($total, 0, ',', '.') }} VNĐ
-                        </td>
-                        <td style="vertical-align: middle;">
-                            <a href="{{ route('cart.clear') }}" class="btn-cancel">Hủy đơn</a>
-                        </td>
-                    </tr>
-                @else
-                    <tr>
-                        <td colspan="6" class="text-center">Giỏ hàng trống! <a href="{{ url('/reservation') }}">Đặt món ngay</a></td>
-                    </tr>
-                @endif
-                </tbody>
-            </table>
-        </div>
+    <div class="box">
+        <h3 class="text-center mb-4 fw-bold">XÁC NHẬN ĐƠN HÀNG</h3>
 
         @if(count($cart) > 0)
-        <form action="{{ route('cart.checkout') }}" method="POST">
-            @csrf
-
-            <div class="form-section shadow-sm">
-                <label class="section-title">📝 Ghi chú đơn hàng</label>
-                <textarea name="order_notes" class="form-control" rows="2">{{ $reservation['notes'] ?? '' }}</textarea>
+            
+            <div class="info-box text-start">
+                <h6 class="fw-bold mb-3" style="color: #28a745;"><i class="fa fa-calendar-check-o"></i> Thông tin đặt bàn</h6>
+                <p class="mb-1">👤 <b>Khách hàng:</b> {{ $reservation['name'] }} (SĐT: {{ $reservation['phone'] }})</p>
+                <p class="mb-1">⏰ <b>Thời gian:</b> {{ $reservation['date'] }}</p>
+                <p class="mb-1">🍽️ <b>Vị trí:</b> Bàn số {{ $reservation['table'] }}</p>
+                @if($reservation['notes'])
+                    <p class="mb-0">📝 <b>Ghi chú:</b> {{ $reservation['notes'] }}</p>
+                @endif
             </div>
 
-            <div class="form-section shadow-sm">
-                <label class="section-title">💳 Phương thức thanh toán</label>
-                
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="radio" name="payment_method" id="cod" value="COD" checked onclick="document.getElementById('qr-box').style.display='none'">
-                    <label class="form-check-label" for="cod">Thanh toán tại quầy</label>
+            <h6 class="mb-3 fw-bold text-muted">Chi tiết món ăn:</h6>
+            @foreach($cart as $item)
+            <div class="item">
+                <img src="{{ asset($item['image'] ?? 'images/default.jpg') }}" alt="Food">
+                <div style="flex-grow: 1;">
+                    <h6 class="mb-0 fw-bold">{{ $item['name'] }}</h6>
+                    <small class="text-muted">SL: {{ $item['quantity'] }} x {{ number_format($item['price'] ?? 0, 0, ',', '.') }}đ</small>
                 </div>
-
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="radio" name="payment_method" id="banking" value="Banking" onclick="document.getElementById('qr-box').style.display='block'">
-                    <label class="form-check-label" for="banking">Chuyển khoản / QR</label>
-                </div>
-
-                <div id="qr-box" style="display:none; margin-top:15px; text-align:center; border-top: 1px dashed #ddd; padding-top: 15px;">
-                    <p style="color:#d9534f; font-weight:bold;">Quét mã QR để thanh toán</p>
-                    <img src="{{ asset('images/qr-bank.jpg') }}" style="width:180px; border-radius:10px; border: 1px solid #eee;">
+                <div class="text-danger fw-bold" style="font-size: 16px;">
+                    {{ number_format(($item['price'] ?? 0) * ($item['quantity'] ?? 0), 0, ',', '.') }}đ
                 </div>
             </div>
+            @endforeach
 
-            <div style="text-align:center; margin-top:30px;">
-                <button type="submit" class="btn-checkout">XÁC NHẬN THANH TOÁN</button>
+            <div class="qr-section">
+                <h5 class="mb-3 fw-bold">Quét mã QR để thanh toán</h5>
+                @php
+                    $memo = 'Thanh toan ban ' . $reservation['table'];
+                    $bankID = 'MB'; // Ný có thể đổi thành VCB, TCB...
+                    $accountNo = '0704409810'; 
+                @endphp
+                <img src="https://img.vietqr.io/image/{{ $bankID }}-{{ $accountNo }}-compact2.png?amount={{ $total }}&addInfo={{ urlencode($memo) }}" 
+                     alt="Mã QR" style="width: 220px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+                <h4 class="text-danger mt-3 fw-bold">Tổng: {{ number_format($total, 0, ',', '.') }} VNĐ</h4>
+                <p class="text-muted small mb-0">Nội dung: {{ $memo }}</p>
             </div>
-        </form>
+
+            <form action="{{ route('cart.checkout') }}" method="POST">
+                @csrf
+                <input type="hidden" name="name" value="{{ $reservation['name'] }}">
+                <input type="hidden" name="phone" value="{{ $reservation['phone'] }}">
+                <input type="hidden" name="address" value="{{ $reservation['notes'] }}">
+                <button type="submit" class="btn-main">XÁC NHẬN & HOÀN TẤT ĐẶT BÀN</button>
+            </form>
+
+            <div class="text-center mt-3">
+                <a href="{{ route('cart.clear') }}" class="text-muted" style="text-decoration: underline;">Huỷ đơn hàng</a>
+            </div>
+
+        @else
+            <div class="text-center py-5">
+                <h5 class="text-muted mb-4">Bạn chưa chọn món nào!</h5>
+                <a href="/reservation" class="btn-main" style="text-decoration: none; padding: 10px 30px;">Quay lại Đặt Bàn</a>
+            </div>
         @endif
     </div>
 </div>
