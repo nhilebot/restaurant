@@ -11,12 +11,16 @@ class AdminUserSeeder extends Seeder
      * Run the database seeds.
      */
     public function run(): void
-{
-    \App\Models\User::create([
-        'name' => 'Admin',
-        'email' => 'leyennhi22122006@gmail.com',
-        'password' => bcrypt('leyennhi@@@'),
-        'role' => 'admin',
-    ]);
-}
+    {
+            \App\Models\User::firstOrCreate(
+            [
+                'email' => 'leyennhi22122006@gmail.com'
+            ],
+            [
+                'name' => 'Admin',
+                'password' => bcrypt('leyennhi@@@'),
+                'role' => 'admin',
+            ]
+        );
+    }
 }
