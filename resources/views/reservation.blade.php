@@ -16,7 +16,7 @@
     <link href='http://fonts.googleapis.com/css?family=Playball' rel='stylesheet' type='text/css'>
 
     <style>
-        /* ===== COPY CSS TỪ TRANG CHỦ ===== */
+        /* ===== CSS ĐỒNG BỘ TỪ TRANG CHỦ ===== */
         .dropdown-custom { position: relative; }
         .dropdown-custom .dropdown-menu {
             position: absolute; top: 100%; left: 0; background: #e9e4dd; 
@@ -34,17 +34,16 @@
         .badge { padding: 3px 6px; border-radius: 50%; font-family: sans-serif; }
         .nav i.fa { margin-right: 5px; font-size: 16px; }
 
-        /* ===== FIX BANNER KHÔNG KHOẢNG TRẮNG ===== */
-        body { padding-top: 70px; } /* Đẩy nội dung xuống dưới menu cố định */
+        body { padding-top: 70px; } 
         
         #reservation .featured.background_content {
-            margin-top: -70px; /* Bù lại padding-top của body để ảnh sát mép trên */
-            padding: 100px 0; /* Tăng độ dày cho banner */
+            margin-top: -70px;
+            padding: 100px 0;
             background-size: cover;
             background-position: center;
         }
 
-        /* ===== CSS CHO FORM ĐẶT BÀN ===== */
+        /* ===== FORM ĐẶT BÀN & STOCK UI ===== */
         .reservation-section { background-color: #ffffff; padding-bottom: 60px; }
         .form-container-custom { max-width: 900px; margin: 40px auto; padding: 30px; background: #fff; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
         .form-title { font-family: 'Playball', cursive; color: #d9534f; font-size: 32px; text-align: center; margin-bottom: 30px; }
@@ -59,7 +58,12 @@
         .btn-reserve { background-color: #d9534f; color: white; padding: 14px; border: none; border-radius: 6px; width: 100%; font-size: 18px; font-weight: bold; text-transform: uppercase; margin-top: 20px; }
         .btn-food-select { background: white; color: #d9534f; border: 1px solid #d9534f; width: 100%; padding: 12px; margin: 10px 0; font-weight: 600; border-radius: 6px; }
 
-        /* Menu Grid Modal */
+        /* Menu Grid Stock */
+        .stock-label { font-size: 12px; margin-bottom: 5px; display: block; }
+        .text-out-stock { color: #d9534f; font-weight: bold; }
+        .text-in-stock { color: #2ecc71; }
+        .btn-add-card:disabled { background: #ccc; cursor: not-allowed; }
+
         .search-container { position: sticky; top: -15px; background: white; padding: 15px 0; z-index: 10; border-bottom: 1px solid #eee; margin-bottom: 20px; }
         .search-input { width: 100%; padding: 10px 20px; border: 2px solid #ddd; border-radius: 25px; outline: none; }
         .category-divider { background: #fcf8f2; padding: 10px 15px; margin: 20px 0 15px 0; border-left: 5px solid #d9534f; font-weight: bold; color: #d9534f; }
@@ -67,7 +71,7 @@
         .menu-card { border: 1px solid #eee; border-radius: 10px; overflow: hidden; display: flex; flex-direction: column; background: #fff;}
         .card-img { width: 100%; height: 160px; object-fit: cover; }
         .card-body { padding: 15px; flex-grow: 1; }
-        .btn-add-card { background: #d9534f; color: white; border: none; padding: 8px; border-radius: 5px; width: 100%; }
+        .btn-add-card { background: #d9534f; color: white; border: none; padding: 8px; border-radius: 5px; width: 100%; transition: 0.3s; }
 
         .cart-wrapper { background: #fdfaf9; padding: 15px; border-radius: 6px; border: 1px dashed #d9534f; margin-bottom: 20px; }
         .cart-item { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee; }
@@ -227,7 +231,7 @@
 
     <script>
     $(document).ready(function () {
-        // Tự động thêm Dropdown Thực đơn giống trang chủ
+        // Đồng bộ Dropdown Menu
         $('.navbar-nav li a').each(function () {
             if ($(this).text().trim() === 'Thực đơn') {
                 let parent = $(this).parent();
@@ -250,6 +254,7 @@
         renderMenu();
     });
 
+    // menuItems sẽ chứa field 'stock' từ Database
     const menuItems = @json($menus); 
     let cart = [];
 
@@ -270,13 +275,25 @@
             if (filteredItems.length > 0) {
                 html += `<div class="category-divider">${category}</div><div class="menu-grid">`;
                 filteredItems.forEach(item => {
+                    const isOutOfStock = item.stock <= 0;
                     html += `
                         <div class="menu-card">
                             <img src="{{ asset('') }}${item.image}" alt="${item.name}" class="card-img" onerror="this.src='https://via.placeholder.com/200x160'">
                             <div class="card-body">
                                 <h4 class="card-title" style="font-size:15px; height:40px; overflow:hidden;">${item.name}</h4>
+                                <div class="stock-label">
+                                    ${isOutOfStock 
+                                        ? '<span class="text-out-stock"><i class="fa fa-times-circle"></i> Tạm hết hàng</span>' 
+                                        : `<span class="text-in-stock"><i class="fa fa-check-circle"></i> Còn lại: ${item.stock}</span>`}
+                                </div>
                                 <span class="card-price" style="color:#d9534f; font-weight:bold;">${formatCurrency(item.price)} VNĐ</span>
-                                <button type="button" class="btn-add-card" onclick="addToCart(${item.id})" style="margin-top:10px;">Chọn</button>
+                                <button type="button" 
+                                        class="btn-add-card" 
+                                        onclick="addToCart(${item.id})" 
+                                        style="margin-top:10px;" 
+                                        ${isOutOfStock ? 'disabled' : ''}>
+                                    ${isOutOfStock ? 'Hết hàng' : 'Chọn'}
+                                </button>
                             </div>
                         </div>`;
                 });
@@ -289,15 +306,34 @@
     function addToCart(id) {
         const item = menuItems.find(i => i.id === id);
         const existing = cart.find(i => i.id === id);
-        if (existing) { existing.quantity += 1; } else { cart.push({ ...item, quantity: 1 }); }
-        updateCartUI();
+        
+        // Kiểm tra tồn kho trước khi thêm
+        const currentQty = existing ? existing.quantity : 0;
+        if (currentQty < item.stock) {
+            if (existing) { 
+                existing.quantity += 1; 
+            } else { 
+                cart.push({ ...item, quantity: 1 }); 
+            }
+            updateCartUI();
+        } else {
+            alert('Rất tiếc, món này chỉ còn tối đa ' + item.stock + ' phần.');
+        }
     }
 
     function updateQuantity(id, change) {
         const index = cart.findIndex(i => i.id === id);
+        const item = menuItems.find(i => i.id === id);
+        
         if (index > -1) {
-            cart[index].quantity += change;
-            if (cart[index].quantity <= 0) cart.splice(index, 1);
+            const newQty = cart[index].quantity + change;
+            if (newQty <= item.stock && newQty > 0) {
+                cart[index].quantity = newQty;
+            } else if (newQty <= 0) {
+                cart.splice(index, 1);
+            } else {
+                alert('Không thể chọn quá số lượng tồn kho!');
+            }
             updateCartUI();
         }
     }
@@ -317,7 +353,7 @@
                 <div class="cart-item">
                     <div style="display:flex; align-items:center; gap:10px;">
                         <img src="{{ asset('') }}${item.image}" class="cart-item-img" onerror="this.src='https://via.placeholder.com/50'">
-                        <div><strong>${item.name}</strong><br><small>${formatCurrency(item.price)} VNĐ</small></div>
+                        <div><strong>${item.name}</strong><br><small>${formatCurrency(item.price)} VNĐ (Kho: ${item.stock})</small></div>
                     </div>
                     <div>
                         <button type="button" class="btn btn-xs btn-default" onclick="updateQuantity(${item.id}, -1)">-</button>
@@ -332,7 +368,6 @@
         list.innerHTML = cartHtml;
         hidden.innerHTML = inputsHtml;
         
-        // Cập nhật Badge trên Menu
         if(totalQty > 0) {
             navCount.innerText = totalQty;
             navCount.style.display = 'block';

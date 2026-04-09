@@ -27,37 +27,42 @@ class ReservationController extends Controller
     }
 
     public function store(Request $request)
-    {
-        $request->validate([
-            'reservation_date' => 'required',
-            'reservation_time' => 'required',
-            'full_name'        => 'required',
-            'phone'            => 'required',
-            'table_id'         => 'required',
-            'notes'            => 'nullable|string|max:255',
-        ]);
+{
+    // 1. Xóa hoặc comment dòng dd này để code có thể chạy tiếp xuống dưới
+    // dd($request->all()); 
 
-        // Gom hết thông tin khách vào 1 hộp lớn
-        $reservationInfo = [
-            'date'   => $request->reservation_date . ' ' . $request->reservation_time,
-            'table'  => $request->table_id,
-            'status' => 'Chờ xác nhận',
-            'name'   => $request->full_name,
-            'phone'  => $request->phone,
-            'notes'  => $request->notes ?? '',
-        ];
+    // 2. Kiểm tra dữ liệu đầu vào
+    $request->validate([
+        'reservation_date' => 'required',
+        'reservation_time' => 'required',
+        'full_name'        => 'required',
+        'phone'            => 'required',
+        'table_id'         => 'required',
+        'notes'            => 'nullable|string|max:255',
+    ]);
 
-        session()->put('reservation_info', $reservationInfo);
+    // 3. Lưu thông tin đặt bàn vào Session
+    $reservationInfo = [
+        'date'   => $request->reservation_date . ' ' . $request->reservation_time,
+        'table'  => $request->table_id,
+        'status' => 'Chờ xác nhận',
+        'name'   => $request->full_name,
+        'phone'  => $request->phone,
+        'notes'  => $request->notes ?? '',
+    ];
+    session()->put('reservation_info', $reservationInfo);
 
-        if ($request->has('foods') && is_array($request->foods)) {
-            $cart = session()->get('cart', []);
+    // 4. Xử lý món ăn (Lưu cả Session và Database)
+    if ($request->has('foods') && is_array($request->foods)) {
+        $cart = session()->get('cart', []);
 
+        try {
             foreach ($request->foods as $id => $item) {
-                $menu = Menu::find($id);
-                if (!$menu) {
-                    continue;
-                }
+                // Tìm món ăn trong bảng menus
+                $menu = \App\Models\Menu::find($id);
+                if (!$menu) continue;
 
+                // A. Cập nhật vào Session cart (để hiển thị trên giao diện)
                 $cart[$id] = [
                     'id'       => $menu->id,
                     'name'     => $menu->name,
@@ -65,12 +70,25 @@ class ReservationController extends Controller
                     'quantity' => $item['quantity'] ?? 1,
                     'image'    => $menu->image,
                 ];
+
+                // B. Lưu trực tiếp vào bảng carts trong Database
+                \App\Models\Cart::create([
+                    'user_id'  => auth()->id() ?? 7, // Mặc định ID là 7 nếu chưa login
+                    'food_id'  => $menu->id,
+                    'quantity' => $item['quantity'] ?? 1,
+                ]);
             }
 
+            // Lưu lại mảng cart vào session
             session()->put('cart', $cart);
-        }
 
-        return redirect()->route('cart.index')
-                         ->with('success', 'Thông tin đặt bàn đã được lưu. Vui lòng kiểm tra lại đơn hàng.');
+        } catch (\Exception $e) {
+            // Nếu có lỗi database (ví dụ chưa chạy migration), nó sẽ dừng lại ở đây để bạn xem lỗi
+            return dd("Lỗi lưu database: " . $e->getMessage());
+        }
     }
+
+    return redirect()->route('cart.index')
+                     ->with('success', 'Thông tin đặt bàn và món ăn đã được lưu thành công!');
+}
 }

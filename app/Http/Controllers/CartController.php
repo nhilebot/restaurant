@@ -67,6 +67,7 @@ class CartController extends Controller
 
         return redirect()->back()->with('success', 'Đã thêm món vào giỏ hàng!');
     }
+    
 
     // 3. Hủy đơn / Xóa giỏ hàng
     public function clear()
