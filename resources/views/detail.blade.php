@@ -44,8 +44,10 @@
             font-size: 18px; border: none; border-radius: 6px; transition: 0.3s;
             text-decoration: none; display: inline-block;
         }
-        .btn-order:hover { background-color: #c9302c; color: white; cursor: pointer; }
+        .btn-order:hover { background-color: #c9302c; color: white; cursor: pointer; text-decoration: none; }
         .login-notice { color: #d9534f; font-weight: bold; margin-bottom: 15px; }
+        .btn-home { background-color: #6c757d; color: white; }
+        .btn-home:hover { background-color: #5a6268; color: white; }
     </style>
 </head>
 <body>
@@ -53,7 +55,7 @@
 <div class="container product-container">
     <div class="row">
         <div class="col-md-6 image-section">
-            <img src="{{ asset($menu->image) }}" alt="{{ $menu->name }}">
+            <img src="{{ asset($menu->image) }}" alt="{{ $menu->name }}" onerror="this.src='https://via.placeholder.com/450'">
             <div class="sale-tag">SALE<br>50%<br>OFF</div>
         </div>
 
@@ -72,29 +74,31 @@
             </p>
 
             @if(Auth::check())
-                {{-- FORM CỦA BẠN ĐÃ ĐƯỢC TÍCH HỢP VÀO ĐÂY --}}
+                {{-- FORM GỬI DỮ LIỆU VÀO GIỎ HÀNG --}}
                 <form action="{{ route('cart.add') }}" method="POST">
                     @csrf
                     <input type="hidden" name="food_id" value="{{ $menu->id }}">
                     
                     <div class="quantity-row">
                         <div class="qty-box">
-                            <label>Số Lượng</label>
-                            <input type="number" name="quantity" value="1" min="1">
+                            <label for="quantity">Số Lượng</label>
+                            <input type="number" id="quantity" name="quantity" value="1" min="1" max="{{ $menu->stock ?? 100 }}">
                         </div>
                         <div class="qty-box">
-                            <label>Số Lượng Có Sẵn</label>
-                            <span style="background: #fff5f5; padding: 7px 20px; border: 1px solid #ddd; display: inline-block;">
-                                {{ $menu->stock ?? 100 }}
+                            <label>Còn lại trong kho</label>
+                            <span style="background: #fff5f5; padding: 7px 20px; border: 1px solid #ddd; display: inline-block; border-radius: 4px;">
+                                {{ $menu->stock ?? 0 }}
                             </span>
                         </div>
                     </div>
 
                     <div style="display: flex; gap: 10px;">
-                        <button type="submit" class="btn-order">Thêm Vào Giỏ Hàng</button>
+                        <button type="submit" class="btn-order">
+                            <i class="fa fa-shopping-cart"></i> THÊM VÀO GIỎ HÀNG
+                        </button>
 
-                        <a href="{{ url('/') }}" class="btn-order" style="background-color: #6c757d; text-decoration: none; display: flex; align-items: center; justify-content: center;">
-                            🏠 Về Trang Chủ
+                        <a href="{{ url('/') }}" class="btn-order btn-home">
+                            🏠 VỀ TRANG CHỦ
                         </a>
                     </div>
                 </form>
@@ -107,18 +111,29 @@
                 </div>
                 <p class="login-notice"><i class="fa fa-lock"></i> Vui lòng đăng nhập để đặt món ăn này.</p>
                 <a href="{{ route('login') }}" class="btn-order">
-                    <i class="fa fa-sign-in"></i> Đăng Nhập Để Mua Hàng
+                    <i class="fa fa-sign-in"></i> ĐĂNG NHẬP ĐỂ MUA HÀNG
                 </a>
             @endif
             
+            {{-- Hiển thị thông báo thành công nếu có --}}
             @if(session('success'))
                 <div class="alert alert-success" style="margin-top: 20px;">
-                    {{ session('success') }}
+                    <i class="fa fa-check-circle"></i> {{ session('success') }}
+                </div>
+            @endif
+
+            {{-- Hiển thị thông báo lỗi nếu có --}}
+            @if(session('error'))
+                <div class="alert alert-danger" style="margin-top: 20px;">
+                    <i class="fa fa-exclamation-triangle"></i> {{ session('error') }}
                 </div>
             @endif
         </div>
     </div>
 </div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
 </body>
 </html>

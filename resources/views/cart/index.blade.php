@@ -6,103 +6,101 @@
     <link rel="stylesheet" href="{{ asset('css/bootstrap.css') }}">
     <link href="{{ asset('css/font-awesome.min.css') }}" rel="stylesheet">
     <style>
-        body { background-color: #f8f9fa; padding: 50px 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #f8f9fa; padding: 50px 0; font-family: 'Segoe UI', sans-serif; }
         .order-container { background: #fff; padding: 30px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .bill-info { background: #fffdf5; padding: 20px; border-radius: 8px; border-left: 5px solid #d9534f; margin-bottom: 25px; }
         .table-order thead { background-color: #f1f1f1; }
-        .table-order th { border: none; color: #555; text-transform: uppercase; font-size: 13px; }
-        .item-row { display: flex; align-items: center; margin-bottom: 10px; border-bottom: 1px dashed #eee; padding-bottom: 5px; }
-        .item-row:last-child { border-bottom: none; }
-        .item-img-mini { width: 50px; height: 50px; object-fit: cover; border-radius: 6px; margin-right: 12px; border: 1px solid #ddd; }
-        .status-text { color: #d9534f; font-weight: bold; text-transform: lowercase; }
-        .btn-checkout { background-color: #d9534f; color: white; padding: 12px 30px; border-radius: 25px; font-weight: bold; border: none; transition: 0.3s; }
-        .btn-checkout:hover { background-color: #c9302c; box-shadow: 0 5px 15px rgba(217, 83, 79, 0.3); }
-        .btn-cancel { color: #d9534f; text-decoration: underline; }
+        .item-img-mini { width: 50px; height: 50px; object-fit: cover; border-radius: 6px; margin-right: 12px; }
+        .btn-checkout { background-color: #d9534f; color: white; padding: 12px 30px; border-radius: 25px; font-weight: bold; border: none; transition: 0.3s; width: 100%; max-width: 300px;}
+        .btn-checkout:hover { background-color: #c9302c; transform: scale(1.05); }
     </style>
 </head>
 <body>
 
-{{-- CẤU HÌNH NGÂN HÀNG AGRIBANK CỦA BẠN TẠI ĐÂY --}}
 @php
-    $bankID = 'VBA'; // VBA là mã của Agribank
-    $accountNo = '6320704409810'; // BẠN ĐIỀN SỐ TK VÀO ĐÂY
-    $accountName = 'Tran Minh Hai Tam'; // BẠN ĐIỀN TÊN KHÔNG DẤU VÀO ĐÂY
-    
-    // Nội dung chuyển khoản: Thanh toan Ban X
+    $bankID = 'VBA'; 
+    $accountNo = '6320704409810'; 
+    $accountName = 'Tran Minh Hai Tam'; 
     $info = "Thanh toan Ban " . ($reservation['table'] ?? '0');
-    
-    // Link tạo mã QR tự động lấy biến $total từ giỏ hàng
     $qrUrl = "https://img.vietqr.io/image/{$bankID}-{$accountNo}-compact.png?amount={$total}&addInfo={$info}&accountName={$accountName}";
 @endphp
 
 <div class="container">
     <div class="order-container">
-        <h3 class="mb-4" style="color: #333; font-weight: bold;">Đơn Hàng Của Bạn</h3>
+        <h3 class="mb-4 text-center text-uppercase" style="color: #d9534f; font-weight: bold;">Hóa Đơn Đặt Bàn</h3>
+
+        <div class="bill-info">
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Khách hàng:</strong> {{ $reservation['name'] }}</p>
+                    <p><strong>Ngày đặt:</strong> {{ $reservation['date'] }}</p>
+                    <p><strong>Giờ đặt:</strong> {{ $reservation['time'] }}</p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Số bàn:</strong> <span class="badge badge-danger">Bàn {{ $reservation['table'] }}</span></p>
+                    <p><strong>Trạng thái:</strong> <span class="text-danger font-weight-bold">{{ $reservation['status'] }}</span></p>
+                    <p><strong>Ghi chú:</strong> <i class="text-muted">{{ $reservation['notes'] ?: 'Không có ghi chú' }}</i></p>
+                </div>
+            </div>
+        </div>
 
         <div class="table-responsive">
             <table class="table table-bordered table-order">
                 <thead>
                     <tr>
                         <th width="40%">Món ăn</th>
-                        <th>Ngày</th>
-                        <th>Trạng thái</th>
-                        <th class="text-center">Bàn</th>
-                        <th>Tổng cộng</th>
-                        <th>Hành động</th>
+                        <th class="text-center">Số lượng</th>
+                        <th class="text-right">Đơn giá</th>
+                        <th class="text-right">Thành tiền</th>
                     </tr>
                 </thead>
                 <tbody>
-                @if(count($cart) > 0)
+                @forelse($cart as $item)
                     <tr>
                         <td>
-                            @foreach($cart as $item)
-                                <div class="item-row">
-                                    <img src="{{ asset($item['image']) }}" class="item-img-mini" onerror="this.src='https://via.placeholder.com/50'">
-                                    <div>
-                                        <div style="font-weight: 600;">{{ $item['name'] }} ({{ $item['quantity'] }})</div>
-                                        <small class="text-muted">{{ number_format($item['price'], 0, ',', '.') }} VNĐ</small>
-                                    </div>
-                                </div>
-                            @endforeach
+                            <div class="d-flex align-items-center">
+                                <img src="{{ asset($item['image']) }}" class="item-img-mini" onerror="this.src='https://via.placeholder.com/50'">
+                                <strong>{{ $item['name'] }}</strong>
+                            </div>
                         </td>
-                        <td style="vertical-align: middle;">{{ $reservation['date'] }}</td>
-                        <td style="vertical-align: middle;" class="status-text">{{ $reservation['status'] }}</td>
-                        <td style="vertical-align: middle;" class="text-center">
-                            <span class="badge badge-danger" style="background-color: #d9534f; padding: 8px 12px;">Bàn {{ $reservation['table'] }}</span>
-                        </td>
-                        <td style="vertical-align: middle; font-weight: bold;">{{ number_format($total, 0, ',', '.') }} VNĐ</td>
-                        <td style="vertical-align: middle;"><a href="{{ route('cart.clear') }}" class="btn-cancel">Hủy đơn</a></td>
+                        <td class="text-center">{{ $item['quantity'] }}</td>
+                        <td class="text-right">{{ number_format($item['price'], 0, ',', '.') }}đ</td>
+                        <td class="text-right" style="font-weight: bold;">{{ number_format($item['price'] * $item['quantity'], 0, ',', '.') }}đ</td>
                     </tr>
-                @else
-                    <tr><td colspan="6" class="text-center">Giỏ hàng trống! <a href="{{ url('/reservation') }}">Đặt món ngay</a></td></tr>
-                @endif
+                @empty
+                    <tr><td colspan="4" class="text-center">Giỏ hàng trống!</td></tr>
+                @endforelse
                 </tbody>
+                <tfoot>
+                    <tr>
+                        <th colspan="3" class="text-right">TỔNG CỘNG:</th>
+                        <th class="text-right text-danger" style="font-size: 1.2rem;">{{ number_format($total, 0, ',', '.') }} VNĐ</th>
+                    </tr>
+                </tfoot>
             </table>
         </div>
 
         @if(count($cart) > 0)
         <form action="{{ route('cart.checkout') }}" method="POST">
             @csrf
-            <div style="margin-top: 20px; padding: 20px; border: 1px solid #ddd; border-radius: 8px;">
-                <label style="font-weight: bold; font-size: 16px;">💳 Chọn phương thức thanh toán</label>
-                <div style="margin-top: 10px;">
-                    <input type="radio" name="payment_method" value="COD" checked onclick="document.getElementById('qr-box').style.display='none'"> Thanh toán tại quầy
+            <div class="mt-4 p-3 border rounded">
+                <h5 class="mb-3">💳 Phương thức thanh toán</h5>
+                <div>
+                    <input type="radio" name="payment_method" value="COD" checked onclick="document.getElementById('qr-box').style.display='none'"> 
+                    <label>Thanh toán tại quầy</label>
                 </div>
                 <div>
-                    <input type="radio" name="payment_method" value="Banking" onclick="document.getElementById('qr-box').style.display='block'"> Chuyển khoản / QR
+                    <input type="radio" name="payment_method" value="Banking" onclick="document.getElementById('qr-box').style.display='block'"> 
+                    <label>Chuyển khoản QR Ngân hàng</label>
                 </div>
 
-                <div id="qr-box" style="display:none; margin-top:15px; text-align:center;">
-                    <p style="color:red; font-weight:bold;">Quét mã QR để thanh toán: {{ number_format($total, 0, ',', '.') }} VNĐ</p>
-                    <img src="{{ $qrUrl }}" style="width:250px; border: 1px solid #eee; border-radius:10px; padding: 10px; background: white;">
-                    <div style="margin-top: 10px; font-size: 13px; color: #666;">
-                        <strong>Agribank</strong><br>
-                        STK: <strong>{{ $accountNo }}</strong><br>
-                        Chủ TK: <strong>{{ $accountName }}</strong>
-                    </div>
+                <div id="qr-box" style="display:none; text-align:center;" class="mt-3">
+                    <img src="{{ $qrUrl }}" style="width:220px; border: 1px solid #ddd; border-radius:10px; padding: 10px;">
+                    <p class="mt-2 text-muted">Chủ TK: {{ $accountName }} - Agribank</p>
                 </div>
             </div>
 
-            <div style="text-align:center; margin-top:20px;">
+            <div class="text-center mt-4">
                 <button type="submit" class="btn-checkout">XÁC NHẬN THANH TOÁN</button>
             </div>
         </form>

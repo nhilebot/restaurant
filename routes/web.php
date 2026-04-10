@@ -47,9 +47,12 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middl
 // --- CÁC ROUTE YÊU CẦU ĐĂNG NHẬP (AUTH) ---
 Route::middleware(['auth'])->group(function () {
     
-    // Hệ thống Giỏ hàng (AJAX & Database)
+    // Hệ thống Giỏ hàng
     Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
-    Route::post('/cart/add', [CartController::class, 'addToCartAjax'])->name('cart.add'); 
+    
+    // --- SỬA DÒNG NÀY: Trỏ về CartController thay vì ReservationController ---
+    Route::post('/cart/add', [CartController::class, 'addToCart'])->name('cart.add'); 
+    
     Route::post('/cart/remove/{id}', [CartController::class, 'remove'])->name('cart.remove');
     Route::get('/clear-cart', [CartController::class, 'clear'])->name('cart.clear');
     Route::post('/checkout', [CartController::class, 'checkout'])->name('cart.checkout');
@@ -64,4 +67,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/admin/order/{order}/status', [AdminController::class, 'updateOrderStatus'])->name('admin.updateOrderStatus');
     Route::get('/orders/{id}', [OrderController::class, 'show']);
 
+    Route::post('/reservation/auto-save', [ReservationController::class, 'autoSave'])->name('reservation.autoSave');
+    // Thêm dòng này vào file routes/web.php
+Route::post('/add-to-cart-ajax', [App\Http\Controllers\ReservationController::class, 'addToCartAjax'])->name('cart.addAjax');
 });
