@@ -1,54 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>contact</title>
-        <meta charset="UTF-8">
-        <title>Restaurant</title>
-        <link rel="stylesheet" href="css/normalize.css">
-        <link rel="stylesheet" href="css/main.css" media="screen" type="text/css">
-        <link href='http://fonts.googleapis.com/css?family=Pacifico' rel='stylesheet' type='text/css'>
-        <link href='http://fonts.googleapis.com/css?family=Playball' rel='stylesheet' type='text/css'>
-        <link rel="stylesheet" href="css/bootstrap.css">
-        <link rel="stylesheet" href="css/style-portfolio.css">
-        <link rel="stylesheet" href="css/picto-foundry-food.css" />
-        <link rel="stylesheet" href="css/jquery-ui.css">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link href="css/font-awesome.min.css" rel="stylesheet">
-        <link rel="icon" href="favicon-1.ico" type="image/x-icon">
+@extends('shared')
 
-</head>
-<body>
-    <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
-            <div class="container">
-                <div class="row">
-                <!-- Brand and toggle get grouped for better mobile display -->
-                    <div class="navbar-header">
-                        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
-                            <span class="sr-only">Toggle navigation</span>
-                            <span class="icon-bar"></span>
-                            <span class="icon-bar"></span>
-                            <span class="icon-bar"></span>
-                        </button>
-                        <a class="navbar-brand" href="#">Restaurant</a>
-                    </div>
+@section('title', 'contact')
 
-                    <!-- Collect the nav links, forms, and other content for toggling -->
-                    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-                        <ul class="nav navbar-nav main-nav  clear navbar-right ">
-                            <li><a class="navactive color_animation" href="{{ url('/') }}">Trang chủ</a></li>
-                             <li><a class="color_animation" href="">Thực đơn</a></li> 
-                            <li><a class="color_animation" href="{{ url('/about') }}">Giới thiệu</a></li>
-                            <li><a class="color_animation" href="{{ url('/featured') }}">Nổi bật</a></li>
-                            <li><a class="color_animation" href="{{ url('/reservation') }}">Đặt bàn</a></li>
-                            <li><a class="color_animation" href="{{ url('/contact') }}">Liên hệ</a></li>
-                        </ul>
-                    </div><!-- /.navbar-collapse -->
-                </div>
-            </div><!-- /.container-fluid -->
-        </nav>
-    <section id="contact">
+@section('head')
+
+@endsection
+
+@section('content')
+<section id="contact">
             <div class="map">
                 <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3618.664063989472!2d91.8316103150038!3d24.909437984030877!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x37505558dd0be6a1%3A0x65c7e47c94b6dc45!2sTechnext!5e0!3m2!1sen!2sbd!4v1444461079802" width="100%" height="450" frameborder="0" style="border:0" allowfullscreen></iframe>
             </div>
@@ -88,6 +47,4 @@
                 </div>
             </div>
         </section>
-
-</body>
-</html>
+@endsection

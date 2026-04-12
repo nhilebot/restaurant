@@ -1,4 +1,4 @@
-@extends('layout')
+@extends('shared')
 
 @section('content')
 
@@ -25,3 +25,7 @@
 </div>
 
 @endsection
+<!-- PHÂN TRANG -->
+<div class="text-center">
+  
+</div>

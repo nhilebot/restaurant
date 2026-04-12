@@ -1,17 +1,9 @@
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <title>Thực đơn Hải sản - Restaurant</title>
-    <link rel="stylesheet" href="{{ asset('css/normalize.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/main.css') }}">
-    <link href='https://fonts.googleapis.com/css?family=Pacifico' rel='stylesheet' type='text/css'>
-    <link href='https://fonts.googleapis.com/css?family=Playball' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" href="{{ asset('css/bootstrap.css') }}">
-    <link href="{{ asset('css/font-awesome.min.css') }}" rel="stylesheet">
-    <link rel="icon" href="{{ asset('favicon-1.ico') }}" type="image/x-icon">
+@extends('shared')
 
-    <style>
+@section('title', 'Thực đơn Salad - Restaurant')
+
+@section('head')
+<style>
         body { background-color: #f9f9f9; padding-top: 100px; }
         
         .navbar-default {
@@ -120,6 +112,14 @@
             margin: 8px 0; 
         }
 
+        /* STYLE CHO CỤM NÚT */
+        .menu-card-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
         .btn-detail {
             background-color: #e74c3c;
             color: white !important;
@@ -137,58 +137,101 @@
             transform: scale(1.05);
         }
 
-        .dropdown:hover .dropdown-menu {
+        .btn-cart {
+            background-color: #27ae60;
+            color: white !important;
+            padding: 8px 16px;
+            border-radius: 30px;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 12px;
+            font-weight: bold;
+            border: none;
+            transition: 0.3s;
+        }
+        .btn-cart:hover {
+            background-color: #229954;
+            transform: scale(1.05);
+        }
+
+        /* TOAST NOTIFICATION */
+        .toast-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #27ae60;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 9999;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        .toast-notification.show { opacity: 1; transform: translateX(0); }
+        .toast-notification.error { background: #e74c3c; }
+
+        /* ===== PAGINATION ===== */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+            margin: 30px 0;
+        }
+
+        .pagination li {
+            display: inline-block;
+        }
+
+        .pagination a, .pagination span {
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            text-decoration: none;
+            color: #333;
+            transition: 0.3s;
             display: block;
         }
+
+        .pagination a:hover {
+            background: #e74c3c;
+            color: white;
+            border-color: #e74c3c;
+        }
+
+        .pagination .active span {
+            background: #e74c3c;
+            color: white;
+            border-color: #e74c3c;
+        }
+
+        .pagination .disabled span {
+            color: #ccc;
+            cursor: not-allowed;
+        }
+
     </style>
-</head>
-<body>
+@endsection
 
-<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
-    <div class="container">
-        <div class="navbar-header">
-            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
-            <a class="navbar-brand" href="{{ url('/') }}" style="font-family: 'Pacifico'; font-size: 28px; color: #ffffff !important;">Restaurant </a>
-        </div>
-        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-            <ul class="nav navbar-nav main-nav clear navbar-right">
-                <li><a class="color_animation" href="{{ url('/') }}">Trang chủ</a></li>
-                <li class="dropdown">
-                    <a class="navactive color_animation dropdown-toggle" data-toggle="dropdown" href="#" style="color: #e74c3c !important;">Thực đơn <span class="caret"></span></a>
-                    <ul class="dropdown-menu" style="background: #222; border-top: 3px solid #e74c3c;">
-                        <li><a href="{{ url('/menu') }}" style="color: #fff !important; padding: 10px;">Thực đơn chi tiết</a></li>
-                        <li><a href="{{ url('/special') }}" style="color: #fff !important; padding: 10px;">Món đặc biệt</a></li>
-                        <li><a href="{{ url('/seafood') }}" style="color: #fff !important; padding: 10px;">Hải sản</a></li>
-                    </ul>
-                </li>
-                <li><a class="color_animation" href="{{ url('/about') }}">Giới thiệu</a></li>
-                <li><a class="color_animation" href="{{ url('/reservation') }}">Đặt bàn</a></li>
-                <li><a class="color_animation" href="{{ url('/contact') }}">Liên hệ</a></li>
-            </ul>
-        </div>
-    </div>
-</nav>
-
+@section('content')
 <div class="container">
     <div class="row">
         <div class="col-xs-12">
-            <h1 class="section-title">Tinh Hoa Hải Sản</h1>
+            <h1 class="section-title">Thực đơn Salad</h1>
             <p class="section-subtitle">
-                Đại tiệc hải sản tươi ngon được đánh bắt trong ngày và chế biến bởi những đầu bếp hàng đầu, mang hương vị biển cả đến bàn ăn của bạn.
+                Góp phần không thể thiếu trong bữa tiệc đầy ắp mỹ vị, quầy salad đầy màu sắc tại Nhà Hàng
+                giúp thực khách cân bằng lại vị giác và cung cấp các chất dinh dưỡng cần thiết cho cơ thể.
             </p>
         </div>
     </div>
     
     <div class="category-nav">
         <a href="{{ url('/menu') }}" class="btn-category">Tất cả</a>
-        <a href="{{ url('/seafood') }}" class="btn-category active">Hải sản</a>
+        <a href="{{ url('/seafood') }}" class="btn-category">Hải sản</a>
         <a href="{{ url('/special') }}" class="btn-category">Món đặc biệt</a>
-        <a href="{{ url('/salad') }}" class="btn-category">Salad</a>
+        <a href="{{ url('/salad') }}" class="btn-category active">Salad</a>
         <a href="{{ url('/vietnamese') }}" class="btn-category">Món Việt</a>
         <a href="{{ url('/desserts') }}" class="btn-category">Tráng miệng</a>
         <a href="{{ url('/drinks') }}" class="btn-category">Đồ uống</a>
@@ -203,25 +246,67 @@
                 </a>
                 <h4 class="product-name">{{ $menu->name }}</h4>
                 <p class="price-text">{{ number_format($menu->price, 0, ',', '.') }} VNĐ</p>
-                <a href="{{ route('menu.detail', $menu->id) }}" class="btn-detail">Xem Chi Tiết</a>
+                
+                <div class="menu-card-buttons">
+                    <a href="{{ route('menu.detail', $menu->id) }}" class="btn-detail">Chi Tiết</a>
+                    <button class="btn-cart add-to-cart-btn" data-food-id="{{ $menu->id }}">
+                        <i class="fa fa-shopping-cart"></i> Thêm
+                    </button>
+                </div>
             </div>
         </div>
         @endforeach
     </div>
 </div>
 
-<footer style="background: #222; color: #fff; padding: 40px 0; margin-top: 50px;" class="text-center">
-    <div class="container">
-        <p>&copy; 2026 Restaurant. All rights reserved.</p>
-        <div class="footer-social">
-            <a href="#" style="color: #fff; margin: 0 10px;"><i class="fa fa-facebook"></i></a>
-            <a href="#" style="color: #fff; margin: 0 10px;"><i class="fa fa-instagram"></i></a>
-            <a href="#" style="color: #fff; margin: 0 10px;"><i class="fa fa-twitter"></i></a>
-        </div>
-    </div>
-</footer>
-
-<script src="{{ asset('js/jquery.min.js') }}"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="{{ asset('js/bootstrap.js') }}"></script>
-</body>
-</html>
+
+<script>
+$(document).ready(function() {
+    $('.add-to-cart-btn').on('click', function(e) {
+        e.preventDefault();
+        var foodId = $(this).data('food-id');
+        var button = $(this);
+        
+        button.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i>...');
+        
+        $.ajax({
+            url: '{{ route("cart.add") }}',
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            data: {
+                food_id: foodId,
+                quantity: 1
+            },
+            success: function(response) {
+                showToast('✓ ' + response.message, 'success');
+                if (response.cart_count) {
+                    $('.navbar .badge').text(response.cart_count);
+                }
+                button.prop('disabled', false).html('<i class="fa fa-shopping-cart"></i> Thêm');
+            },
+            error: function(xhr) {
+                var errorMessage = xhr.status === 401 ? 'Bạn cần đăng nhập!' : 'Có lỗi xảy ra!';
+                showToast('✗ ' + errorMessage, 'error');
+                button.prop('disabled', false).html('<i class="fa fa-shopping-cart"></i> Thêm');
+            }
+        });
+    });
+
+    function showToast(message, type) {
+        $('.toast-notification').remove();
+        var toastClass = type === 'error' ? 'toast-notification error' : 'toast-notification';
+        var toast = $('<div class="' + toastClass + '">' + message + '</div>');
+        $('body').append(toast);
+        setTimeout(function() { toast.addClass('show'); }, 100);
+        setTimeout(function() {
+            toast.removeClass('show');
+            setTimeout(function() { toast.remove(); }, 300);
+        }, 3000);
+    }
+});
+</script>
+@endsection

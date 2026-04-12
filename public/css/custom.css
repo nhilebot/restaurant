@@ -5,30 +5,81 @@
     align-items: center;
     gap: 30px;
     margin-top: 80px;
+    flex-wrap: wrap;
 }
 
 /* ====== BUTTON STYLE ====== */
 .btn-main {
-    padding: 14px 42px;
-    border: 2px solid #ffffff;
-    color: #ffffff;
+    padding: 16px 48px;
+    border: 2px solid #e74c3c;
+    color: #e74c3c;
     text-decoration: none;
-    font-size: 16px;
-    letter-spacing: 3px;
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: 2px;
     text-transform: uppercase;
-    font-weight: 500;
-    transition: all 0.35s ease;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     display: inline-block;
-    min-width: 200px;
+    min-width: 220px;
     text-align: center;
-    background: transparent;
+    background: linear-gradient(135deg, rgba(231, 76, 60, 0.1), rgba(231, 76, 60, 0.05));
+    border-radius: 50px;
+    box-shadow: 0 4px 15px rgba(231, 76, 60, 0.2);
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+}
+
+.btn-main::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+}
+
+.btn-main:hover::before {
+    left: 100%;
 }
 
 /* ====== HOVER (giống web xịn) ====== */
 .btn-main:hover {
-    background-color: #d9f2fc;
-    color: #000000;
-    border-color: #ffffff;
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+    color: #ffffff;
+    border-color: #e74c3c;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(231, 76, 60, 0.4);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* ====== RESPONSIVE DESIGN ====== */
+@media (max-width: 768px) {
+    .action-buttons {
+        gap: 20px;
+        margin-top: 50px;
+    }
+
+    .btn-main {
+        min-width: 180px;
+        padding: 14px 36px;
+        font-size: 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .action-buttons {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .btn-main {
+        min-width: 200px;
+        padding: 12px 30px;
+        font-size: 14px;
+    }
 }
 
 /* ====== CANH GIỮA THEO CHIỀU DỌC (nếu nằm trên banner) ====== */
@@ -45,4 +96,122 @@
     align-items: center;     /* căn giữa theo chiều dọc */
     height: 100vh;           /* chiếm toàn bộ chiều cao màn hình */
 }
+.pagination {
+    margin-top: 30px;
+}
 
+.pagination li a,
+.pagination li span {
+    color: #e74c3c !important;
+    border-radius: 50px !important;
+    margin: 0 3px;
+}
+
+.pagination .active span {
+    background-color: #e74c3c !important;
+    border-color: #e74c3c !important;
+    color: white !important;
+}
+.pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+/* ===== RESET FONT + COLOR TOÀN TRANG (GỌN GÀNG) ===== */
+body {
+    font-family: "museo-sans", helvetica, sans-serif;
+    color: #2f2e2f;
+    margin: 0;
+    padding: 0;
+}
+
+/* ===== FOOTER STYLE ===== */
+.sub_footer {
+    background-color: #111; /* nền đen */
+    color: #fff;
+    padding: 50px 0 20px;
+}
+
+/* Tiêu đề */
+.sub_footer h1,
+.sub_footer h2,
+.sub_footer h3 {
+    color: #fff;
+    margin-bottom: 15px;
+}
+
+/* Nội dung chữ */
+.sub_footer p,
+.sub_footer span {
+    color: #ccc;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+/* Link footer */
+.sub_footer a {
+    color: #ccc;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+/* Hover link */
+.sub_footer a:hover {
+    color: #e33c3c;
+    text-decoration: none;
+}
+
+/* Danh sách menu */
+.footer-links {
+    list-style: none;
+    padding: 0;
+}
+
+.footer-links li {
+    margin-bottom: 8px;
+}
+
+/* Logo footer */
+.footer-logo {
+    font-size: 24px;
+    font-weight: bold;
+    color: #fff;
+}
+
+/* Tiêu đề nhỏ */
+.footer-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #fff;
+}
+
+/* Social icon */
+.footer-social {
+    margin-top: 15px;
+}
+
+.footer-social a {
+    display: inline-block;
+    margin-right: 10px;
+    font-size: 18px;
+    color: #ccc;
+    transition: all 0.3s ease;
+}
+
+/* Hover icon */
+.footer-social a:hover {
+    color: #f14040;
+    transform: scale(1.2);
+}
+
+/* Đường kẻ */
+.footer-bottom hr {
+    border-top: 1px solid #444;
+    margin: 20px 0;
+}
+
+/* Copyright */
+.footer-bottom p {
+    font-size: 13px;
+    color: #aaa;
+}

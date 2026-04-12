@@ -1,10 +1,9 @@
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Xác nhận đơn hàng - Restaurant</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+@extends('shared')
+
+@section('title', 'Xác nhận đơn hàng - Restaurant')
+
+@section('head')
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
     <style>
         body { 
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
@@ -28,7 +27,6 @@
             color: #333; 
             margin-bottom: 20px; 
         }
-
         /* KHU VỰC THÔNG TIN KHÁCH HÀNG (Giống ảnh mẫu) */
         .customer-info {
             border: 1px dashed #d9534f; /* Viền đứt màu đỏ */
@@ -59,7 +57,6 @@
             width: 110px;
             color: #555;
         }
-
         /* BẢNG GIỎ HÀNG */
         .cart-table { 
             width: 100%; 
@@ -78,7 +75,6 @@
             border-bottom: 1px solid #eee; 
             vertical-align: middle; 
         }
-        
         /* Flexbox hiển thị ảnh và tên trên 1 hàng */
         .product-cell { 
             display: flex; 
@@ -96,7 +92,6 @@
             font-weight: 600; 
             font-size: 14px; 
         }
-        
         .quantity-control {
             display: flex;
             align-items: center;
@@ -110,7 +105,6 @@
             cursor: pointer;
             border-radius: 3px;
         }
-        
         /* TỔNG CỘNG */
         .cart-summary { 
             text-align: right; 
@@ -123,7 +117,6 @@
             font-weight: bold; 
             color: #000; 
         }
-
         .note-section {
             margin-top: 20px;
         }
@@ -141,9 +134,9 @@
             resize: vertical;
         }
     </style>
-</head>
-<body>
+@endsection
 
+@section('content')
 <div class="cart-container">
     <h2 class="cart-title">ĐƠN HÀNG CỦA BẠN</h2>
 
@@ -216,6 +209,4 @@
         </div>
     @endif
 </div>
-
-</body>
-</html>
+@endsection

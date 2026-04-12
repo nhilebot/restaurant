@@ -82,9 +82,7 @@ class AuthController extends Controller
             'role' => 'customer',
         ]);
 
-        Auth::login($user);
-
-        return redirect('/')->with('success', 'Đăng ký thành công!');
+        return redirect()->route('register')->with('register_success', true);
     }
 
     // Xử lý đăng xuất

@@ -50,53 +50,41 @@ class CartController extends Controller
      * 2. THÊM MÓN VÀO GIỎ HÀNG
      */
     public function addToCart(Request $request)
-    {
-        if (!Auth::check()) {
-            return redirect()->route('login')->with('error', 'Bạn cần đăng nhập để đặt món!');
-        }
-
-        $foodId = $request->input('food_id');
-        $quantity = $request->input('quantity', 1);
-
-        $menu = Menu::find($foodId);
-        if (!$menu) {
-            return redirect()->back()->with('error', 'Món ăn không tồn tại!');
-        }
-
-        $cart = session()->get('cart', []);
-
-        if (isset($cart[$foodId])) {
-            $cart[$foodId]['quantity'] += $quantity;
-        } else {
-            $cart[$foodId] = [
-                "id"       => $menu->id,
-                "name"     => $menu->name,
-                "quantity" => (int)$quantity,
-                "price"    => $menu->price,
-                "image"    => $menu->image
-            ];
-        }
-
-        session()->put('cart', $cart);
-
-        // LƯU DỰ PHÒNG VÀO DATABASE VÀ BÁO CHO TRANG ĐẶT BÀN
-        $latestReservation = Reservation::where('user_id', Auth::id())->latest()->first();
-        if ($latestReservation) {
-            // Lưu món ăn vào database
-            $latestReservation->update(['cart_data' => $cart]);
-            
-            // BƠM LẠI SESSION ĐỂ TRANG ĐẶT BÀN HIỂN THỊ "ĐÃ ĐẶT TRƯỚC"
-            session()->put('reservation_info', [
-                'table'  => $latestReservation->table_id,
-                'date'   => $latestReservation->reservation_date,
-                'time'   => $latestReservation->reservation_time,
-                'name'   => $latestReservation->full_name,
-                'status' => 'Đang xử lý'
-            ]);
-        }
-
-        return redirect()->route('cart.index')->with('success', 'Đã thêm món ăn vào giỏ hàng!');
+{
+    if (!auth()->check()) {
+        return response()->json(['error' => 'Bạn cần đăng nhập để đặt món!'], 401);
     }
+
+    $foodId = $request->input('food_id');
+    $quantity = (int)$request->input('quantity', 1);
+
+    $menu = \App\Models\Menu::find($foodId);
+    if (!$menu) {
+        return response()->json(['error' => 'Món ăn không tồn tại!'], 404);
+    }
+
+    $cart = session()->get('cart', []);
+
+    if (isset($cart[$foodId])) {
+        $cart[$foodId]['quantity'] += $quantity;
+    } else {
+        $cart[$foodId] = [
+            "id"       => $menu->id,
+            "name"     => $menu->name,
+            "quantity" => $quantity,
+            "price"    => $menu->price,
+            "image"    => $menu->image
+        ];
+    }
+
+    session()->put('cart', $cart);
+    session()->save(); // Lưu lại session ngay lập tức
+
+    return response()->json([
+        'message' => 'Món ' . $menu->name . ' đã được thêm.',
+        'cart_count' => count($cart)
+    ]);
+}
 
     /**
      * 3. XÓA SẠCH GIỎ HÀNG
@@ -118,55 +106,20 @@ class CartController extends Controller
     /**
      * 4. THANH TOÁN (Xử lý chốt đơn cuối cùng)
      */
-    public function checkout(Request $request)
-    {
-        $cart = session()->get('cart', []);
+   public function checkout()
+{
+    $userId = auth()->id();
 
-        if (empty($cart)) {
-            return redirect()->back()->with('error', 'Giỏ hàng đang trống!');
-        }
+    // 🔥 CHUYỂN pending → confirmed
+    Reservation::where('user_id', $userId)
+        ->where('status', 'pending')
+        ->update([
+            'status' => 'confirmed'
+        ]);
 
-        try {
-            DB::transaction(function () use ($cart, $request) {
-                // Lấy đơn đặt bàn chuẩn nhất
-                $resInfo = Reservation::where('user_id', Auth::id())->latest()->first();
-                
-                $totalAmount = 0;
-                foreach($cart as $item) {
-                    $totalAmount += ($item['price'] ?? 0) * ($item['quantity'] ?? 0);
-                }
+    session()->forget('cart');
 
-                // Lưu Order
-                $order = Order::create([
-                    'user_id'        => Auth::id(), 
-                    'table_number'   => $resInfo ? $resInfo->table_id : 'Mang về',
-                    'total_price'    => $totalAmount,
-                    'status'         => 'Chờ xác nhận',
-                ]);
-
-                // Lưu chi tiết từng món
-                foreach ($cart as $id => $item) {
-                    $order->orderItems()->create([
-                        'product_id'  => $item['id'], // Hoặc thay bằng 'menu_id' nếu bảng DB của Nhi đặt tên vậy
-                        'product_name'=> $item['name'], // Hoặc bỏ nếu bảng order_items không có cột này
-                        'quantity'    => $item['quantity'],
-                        'price'       => $item['price'],
-                    ]);
-                }
-
-                // Chốt đơn xong thì cập nhật Reservation thành hoàn tất
-                if ($resInfo) {
-                    $resInfo->update(['status' => 'completed']);
-                }
-            });
-
-            // Thanh toán xong thì dọn sạch giỏ hàng
-            session()->forget(['cart']);
-
-            return redirect('/')->with('success', '🎉 Chốt đơn thành công! Nhà hàng đã nhận thông tin đặt bàn của bạn.');
-
-        } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Lỗi hệ thống khi lưu đơn: ' . $e->getMessage());
-        }
-    }
+    return redirect()->route('reservation.index')
+        ->with('success', 'Thanh toán thành công!');
+}
 }

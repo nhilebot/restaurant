@@ -15,7 +15,7 @@ class MenuchitietController extends Controller
 
     public function special()
     {
-        $menus = Menu::where('category', 'special')->get();
+         $menus = Menu::where('category', 'special')->get();
         return view('special', compact('menus'));
     }
 
@@ -28,6 +28,7 @@ class MenuchitietController extends Controller
     public function desserts()
 {
     // Nếu trong DB category là 'dessert'
+    // Thay get() bằng paginate(số_món_1_trang)
     $menus = Menu::where('category', 'dessert')->get();
     return view('desserts', compact('menus'));
 }
@@ -54,5 +55,6 @@ class MenuchitietController extends Controller
     {
         $menu = Menu::findOrFail($id);
         return view('detail', compact('menu')); // đổi nếu file view khác
+        
     }
 }

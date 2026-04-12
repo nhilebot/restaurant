@@ -1,11 +1,9 @@
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <title>Thanh Toán Bàn Của Bạn</title>
-    <link rel="stylesheet" href="{{ asset('css/bootstrap.css') }}">
-    <link href="{{ asset('css/font-awesome.min.css') }}" rel="stylesheet">
-    <style>
+@extends('shared')
+
+@section('title', 'Thanh Toán Bàn Của Bạn')
+
+@section('head')
+<style>
         body { background-color: #f8f9fa; padding: 50px 0; font-family: 'Segoe UI', sans-serif; }
         .order-container { background: #fff; padding: 30px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
         .bill-info { background: #fffdf5; padding: 20px; border-radius: 8px; border-left: 5px solid #d9534f; margin-bottom: 25px; }
@@ -14,9 +12,9 @@
         .btn-checkout { background-color: #d9534f; color: white; padding: 12px 30px; border-radius: 25px; font-weight: bold; border: none; transition: 0.3s; width: 100%; max-width: 300px;}
         .btn-checkout:hover { background-color: #c9302c; transform: scale(1.05); }
     </style>
-</head>
-<body>
+@endsection
 
+@section('content')
 @php
     $bankID = 'VBA'; 
     $accountNo = '6320704409810'; 
@@ -24,7 +22,11 @@
     $info = "Thanh toan Ban " . ($reservation['table'] ?? '0');
     $qrUrl = "https://img.vietqr.io/image/{$bankID}-{$accountNo}-compact.png?amount={$total}&addInfo={$info}&accountName={$accountName}";
 @endphp
-
+@if(session('success'))
+    <div class="alert alert-success" style="margin:20px;">
+        {{ session('success') }}
+    </div>
+@endif
 <div class="container">
     <div class="order-container">
         <h3 class="mb-4 text-center text-uppercase" style="color: #d9534f; font-weight: bold;">Hóa Đơn Đặt Bàn</h3>
@@ -107,5 +109,4 @@
         @endif
     </div>
 </div>
-</body>
-</html>
+@endsection

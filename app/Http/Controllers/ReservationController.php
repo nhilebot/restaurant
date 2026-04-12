@@ -19,91 +19,79 @@ class ReservationController extends Controller
     /**
      * Hiển thị trang đặt bàn
      */
-    public function index(Request $request)
+    public function index()
 {
-    $menus = Menu::all();
-    $today = now()->toDateString(); 
+    $menus = \App\Models\Menu::select('id', 'name', 'price', 'image', 'stock', 'category')
+        ->distinct()
+        ->get();
 
-    // Lấy danh sách ID bàn đã được đặt trong ngày hôm nay
-    $bookedTableIds = Reservation::whereDate('reservation_date', $today)
-                        ->whereIn('status', ['confirmed', 'pending']) // Lấy cả đơn đang chờ và đã xác nhận
-                        ->pluck('table_id')
-                        ->toArray();
+    // 🔥 CHỈ khóa bàn đã đặt khi click thanh toán
+    $bookedTableIds = \App\Models\Reservation::where('status', 'confirmed')
+        ->pluck('table_id')
+        ->toArray();
 
-    // Đồng bộ giỏ hàng từ Session hoặc DB (giữ nguyên logic cũ của bạn)
-    $cart = session()->get('cart', []);
-    $total = 0;
-    foreach($cart as $item) {
-        $total += $item['price'] * $item['quantity'];
-    }
-
-    return view('reservation', compact('menus', 'cart', 'total', 'bookedTableIds'));
+    return view('reservation', compact('menus', 'bookedTableIds'));
 }
-
     /**
      * Lưu thông tin đặt bàn và món ăn
      */
  public function store(Request $request)
 {
-    // 1. Kiểm tra dữ liệu đầu vào
     $request->validate([
         'reservation_date' => 'required',
         'reservation_time' => 'required',
-        'table_id'         => 'required',
-        'full_name'        => 'required',
-        'phone'            => 'required',
+        'table_id' => 'required',
+        'full_name' => 'required',
+        'phone' => 'required',
     ]);
 
-    $userId = auth()->id();
-
-    // 2. QUAN TRỌNG: Lấy toàn bộ món ăn đang có trong giỏ (bao gồm cả Cua hấp, Mực, Sò)
     $cart = session()->get('cart', []);
 
-    // 3. Lưu tất cả vào Database
-    $reservation = \App\Models\Reservation::updateOrCreate(
-        [
-            'user_id' => $userId,
-            'status'  => 'pending' 
-        ],
-        [
-            'reservation_date' => $request->reservation_date,
-            'reservation_time' => $request->reservation_time,
-            'table_id'         => $request->table_id,
-            'full_name'        => $request->full_name,
-            'phone'            => $request->phone,
-            'notes'            => $request->notes,
-            'cart_data'        => $cart, // Đưa hết món ăn vào "vali" mang sang trang Giỏ hàng
-        ]
-    );
+    \App\Models\Reservation::create([
+        'user_id' => auth()->id(),
+        'reservation_date' => $request->reservation_date,
+        'reservation_time' => $request->reservation_time,
+        'table_id' => $request->table_id,
+        'full_name' => $request->full_name,
+        'phone' => $request->phone,
+        'notes' => $request->notes,
+        'cart_data' => $cart,
+        'status' => 'pending' // 🔥 QUAN TRỌNG
+    ]);
 
-    // 4. Cập nhật lại Session để trang Giỏ hàng đồng bộ hoàn toàn
-    session()->put('cart', $cart);
-
-    return redirect()->route('cart.index')->with('success', 'Đã cập nhật đơn hàng thành công!');
+   return redirect()->route('cart.index')
+    ->with('success', 'Đặt bàn thành công!'); // 👉 chuyển qua giỏ hàng
 }
 public function addToCartAjax(Request $request)
 {
     $cart = session()->get('cart', []);
     $id = $request->id;
 
+    // Kiểm tra món ăn có tồn tại không
+    $menu = \App\Models\Menu::find($id);
+    if (!$menu) {
+        return response()->json(['success' => false, 'message' => 'Món ăn không tồn tại!']);
+    }
+
     if (isset($cart[$id])) {
         $cart[$id]['quantity']++;
     } else {
         $cart[$id] = [
             "id"       => $id,
-            "name"     => $request->name,
+            "name"     => $menu->name, // Lấy từ DB cho chắc chắn
             "quantity" => 1,
-            "price"    => $request->price,
-            "image"    => $request->image
+            "price"    => $menu->price,
+            "image"    => $menu->image
         ];
     }
 
     session()->put('cart', $cart);
+    session()->save(); // Ép Laravel lưu session ngay lập tức
     
-    // Trả về số lượng để cập nhật icon giỏ hàng nếu cần
     return response()->json([
         'success' => true, 
-        'cartCount' => count($cart)
+        'cartCount' => count($cart),
+        'cartData' => array_values($cart) // Trả về mảng để JS cập nhật UI
     ]);
 }
 }

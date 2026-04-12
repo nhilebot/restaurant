@@ -9,7 +9,10 @@ class Menu extends Model
 {
     use HasFactory;
 
-protected $fillable = ['name', 'price', 'image', 'description', 'stock', 'category'];
+    protected $fillable = ['name', 'price', 'image', 'description', 'stock', 'category'];
+    
+    protected $hidden = ['created_at', 'updated_at'];
+    
     public function orderItems()
     {
         return $this->hasMany(OrderItem::class);

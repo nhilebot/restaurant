@@ -858,9 +858,112 @@ MEDIA QUERIE DESKTOP
     }
 }
 body {
-    padding-top: 160px;
+    padding-top: 0px;
 }
 .color_animation {
     margin: 0; /* bỏ margin âm */
     color: white;
+}
+/* ===== FIX NAVBAR GIỐNG MENU ===== */
+
+/* Navbar nền đen */
+.navbar.navbar-default {
+    background: #222 !important;
+    border: none !important;
+}
+
+/* Link trắng */
+.navbar-default .navbar-nav > li > a {
+    color: #fff !important;
+    transition: 0.3s;
+}
+
+/* Hover đỏ giống menu */
+.navbar-default .navbar-nav > li > a:hover {
+    color: #e74c3c !important;
+}
+
+/* Active đỏ */
+.navactive {
+    color: #e74c3c !important;
+    border-bottom: none !important;
+}
+
+/* Logo */
+.navbar-brand {
+    color: #fff !important;
+}
+
+/* ===== FIX DROPDOWN ===== */
+.dropdown-custom {
+    position: relative;
+}
+
+.dropdown-custom .dropdown-menu {
+    display: none;
+    position: absolute;
+    background: #222;
+    border-top: 3px solid #e74c3c;
+    padding: 0;
+}
+
+
+
+/* Item */
+.dropdown-menu li a {
+    color: #fff !important;
+    padding: 10px 15px;
+}
+
+/* Hover item */
+.dropdown-menu li a:hover {
+    background: #e74c3c;
+}
+
+/* ===== FIX COLOR CŨ (QUAN TRỌNG) ===== */
+
+/* Ghi đè màu xanh cũ */
+.color_animation:hover {
+    color: #e74c3c !important;
+}
+
+/* Ghi đè nav hover cũ */
+.main-nav a:hover {
+    color: #e74c3c !important;
+}
+/* Làm đẹp bộ phân trang */
+.pagination-custom .pagination {
+    border-radius: 50px;
+}
+
+.pagination-custom .pagination > li > a, 
+.pagination-custom .pagination > li > span {
+    color: #e74c3c; /* Màu đỏ chủ đạo */
+    background-color: #fff;
+    border: 1px solid #ddd;
+    margin: 0 4px;
+    padding: 8px 16px;
+    border-radius: 50% !important; /* Biến nút thành hình tròn */
+    font-weight: bold;
+    transition: all 0.3s;
+}
+
+/* Khi di chuột qua nút */
+.pagination-custom .pagination > li > a:hover {
+    background-color: #fceaea !important;
+    border-color: #e74c3c !important;
+    color: #e74c3c !important;
+}
+
+/* Nút đang được chọn (Active) */
+.pagination-custom .pagination > .active > span, 
+.pagination-custom .pagination > .active > span:hover {
+    background-color: #e74c3c !important;
+    border-color: #e74c3c !important;
+    color: #fff !important;
+}
+
+/* Ẩn các icon mũi tên lạ nếu có */
+.pagination svg {
+    width: 20px;
 }
