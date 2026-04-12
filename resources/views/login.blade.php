@@ -8,10 +8,9 @@
 <style>
         body { 
             background-color: #f9f9f9; 
-            font-family: "Times New Roman",
+            font-family: "Times New Roman";
         }
         .breeze-card { 
-            /* background: white;  */
             max-width: 450px; 
             margin: 80px auto; 
             padding: 2.5rem; 
@@ -75,64 +74,60 @@
             color: #e74c3c;
             text-decoration: underline;
         }
-        .form-check-input:checked {
-            background-color: #e74c3c;
-            border-color: #e74c3c;
-        }
-    </style>
+</style>
 @endsection
 
 @section('content')
 <div class="container">
-        <div class="breeze-card">
-            <div class="text-center mb-4">
-                <h3 class="login-title">Đăng Nhập</h3>
-                <p style="color: #777; font-size: 14px; font-family: sans-serif;">Chào mừng bạn quay trở lại!</p>
+    <div class="breeze-card">
+        <div class="text-center mb-4">
+            <h3 class="login-title">Đăng Nhập</h3>
+            <p style="color: #777; font-size: 14px; font-family: sans-serif;">Chào mừng bạn quay trở lại!</p>
+        </div>
+
+        @if(session('success'))
+            <div class="alert alert-success" style="border-radius: 30px; font-family: sans-serif;">{{ session('success') }}</div>
+        @endif
+
+        @if($errors->any())
+            <div class="alert alert-danger" style="border-radius: 15px; font-family: sans-serif; font-size: 13px;">
+                <ul class="mb-0">
+                    @foreach($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
+        <form method="POST" action="{{ route('login.post') }}">
+            @csrf
+            <div class="mb-3">
+                <label for="email" class="breeze-label">Email</label>
+                <input id="email" type="email" name="email" class="form-control" value="{{ old('email') }}" placeholder="user@example.com" required autofocus>
             </div>
 
-            @if(session('success'))
-                <div class="alert alert-success" style="border-radius: 30px; font-family: sans-serif;">{{ session('success') }}</div>
-            @endif
+            <div class="mb-3">
+                <label for="password" class="breeze-label">Mật khẩu</label>
+                <input id="password" type="password" name="password" class="form-control" placeholder="••••••••" required>
+            </div>
 
-            @if($errors->any())
-                <div class="alert alert-danger" style="border-radius: 15px; font-family: sans-serif; font-size: 13px;">
-                    <ul class="mb-0">
-                        @foreach($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
+            <div class="text-right mb-3">
+                <a href="{{ route('password.request') }}" class="register-link">Quên mật khẩu?</a>
+            </div>
 
-            <form method="POST" action="{{ route('login.post') }}">
-                @csrf
-                <div class="mb-3">
-                    <label for="email" class="breeze-label">Email</label>
-                    <input id="email" type="email" name="email" class="form-control" value="{{ old('email') }}" placeholder="user@example.com" required autofocus>
+            <div class="mb-4 d-flex justify-content-between align-items-center" style="font-family: sans-serif; font-size: 14px;">
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="remember" name="remember" style="cursor: pointer;">
+                    <label class="form-check-label" for="remember" style="color: #4b5563; cursor: pointer; margin-left: 5px;">Ghi nhớ tôi</label>
                 </div>
+            </div>
 
-                <div class="mb-3">
-                    <label for="password" class="breeze-label">Mật khẩu</label>
-                    <input id="password" type="password" name="password" class="form-control" placeholder="••••••••" required>
-                </div>
-                 <div class="text-right mb-3">
-                    <a href="{{ route('password.request') }}" class="register-link">
-                        Quên mật khẩu?
-                    </a>
-                </div>
-                <div class="mb-4 d-flex justify-content-between align-items-center" style="font-family: sans-serif; font-size: 14px;">
-                    <div class="form-check">
-                        <input type="checkbox" class="form-check-input" id="remember" name="remember" style="cursor: pointer;">
-                        <label class="form-check-label" for="remember" style="color: #4b5563; cursor: pointer; margin-left: 5px;">Ghi nhớ tôi</label>
-                    </div>
-                </div>
-
-                <button type="submit" class="btn btn-breeze shadow-sm">ĐĂNG NHẬP</button>
-                
-                <div class="text-center mt-4">
-                    <a href="{{ route('register') }}" class="register-link">Bạn chưa có tài khoản? <strong>Đăng ký ngay</strong></a>
-                </div>
-            </form>
-        </div>
+            <button type="submit" class="btn btn-breeze shadow-sm">ĐĂNG NHẬP</button>
+            
+            <div class="text-center mt-4">
+                <a href="{{ route('register') }}" class="register-link">Bạn chưa có tài khoản? <strong>Đăng ký ngay</strong></a>
+            </div>
+        </form>
     </div>
+</div>
 @endsection

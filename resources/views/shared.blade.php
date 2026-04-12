@@ -30,47 +30,50 @@
                     <a class="navbar-brand" href="{{ url('/') }}">Restaurant</a>
                 </div>
                 <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-                    <ul class="nav navbar-nav main-nav navbar-right">
-                        <li><a class="color_animation" href="{{ url('/') }}">Trang chủ</a></li>
-                        <li><a class="color_animation" href="{{ url('/menu') }}">Thực đơn</a></li>
-                        <li><a class="color_animation" href="{{ url('/reservation') }}">Đặt bàn</a></li>
-                        <li>
-                            <a class="color_animation" href="{{ url('/cart') }}" style="position: relative;">
-                                <i class="fa fa-shopping-cart"></i>
-                                @if(session('cart') && count(session('cart')) > 0)
-                                    <span class="badge" style="background: #96E16B; color: #000; position: absolute; top: 0; right: 0; font-size: 10px;">
-                                        {{ count(session('cart')) }}
-                                    </span>
-                                @endif
-                            </a>
-                        </li>
-                        @guest
-                            <li><a class="color_animation" href="{{ route('login') }}">Đăng nhập</a></li>
-                            <li><a class="color_animation" href="{{ route('register') }}">Đăng ký</a></li>
-                        @endguest
-                        @auth
-                            <li class="dropdown">
-                                <a href="#" class="dropdown-toggle color_animation" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-                                    <i class="fa fa-user"></i> {{ Auth::user()->name }} <span class="caret"></span>
-                                </a>
-                                <ul class="dropdown-menu">
-                                    @if(Auth::user()->role == 'admin')
-                                        <li><a href="{{ url('/admin') }}">Quản trị viên</a></li>
-                                    @endif
-                                    <li><a href="{{ url('/profile') }}">Hồ sơ của tôi</a></li>
-                                    <li>
-                                        <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" style="color: #e74c3c;">
-                                            <i class="fa fa-sign-out"></i> Đăng xuất
-                                        </a>
-                                        <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-                                            @csrf
-                                        </form>
-                                    </li>
-                                </ul>
-                            </li>
-                        @endauth
-                    </ul>
-                </div>
+    <ul class="nav navbar-nav navbar-center-custom">
+        <li><a class="color_animation" href="{{ url('/') }}">Trang chủ</a></li>
+        <li><a class="color_animation" href="{{ url('/menu') }}">Thực đơn</a></li>
+        <li><a class="color_animation" href="{{ url('/reservation') }}">Đặt bàn</a></li>
+    </ul>
+
+    <ul class="nav navbar-nav navbar-right">
+        <li>
+            <a class="color_animation" href="{{ url('/cart') }}" style="position: relative;">
+                <i class="fa fa-shopping-cart"></i>
+                @if(session('cart') && count(session('cart')) > 0)
+                    <span class="badge" style="background: #96E16B; color: #000; position: absolute; top: 0; right: 0; font-size: 10px;">
+                        {{ count(session('cart')) }}
+                    </span>
+                @endif
+            </a>
+        </li>
+        @guest
+            <li><a class="color_animation" href="{{ route('login') }}">Đăng nhập</a></li>
+            <li><a class="color_animation" href="{{ route('register') }}">Đăng ký</a></li>
+        @endguest
+        @auth
+            <li class="dropdown">
+                <a href="#" class="dropdown-toggle color_animation" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                    <i class="fa fa-user"></i> {{ Auth::user()->name }} <span class="caret"></span>
+                </a>
+                <ul class="dropdown-menu">
+                    @if(Auth::user()->role == 'admin')
+                        <li><a href="{{ url('/admin') }}">Quản trị viên</a></li>
+                    @endif
+                    <li><a href="{{ url('/profile') }}">Hồ sơ của tôi</a></li>
+                    <li>
+                        <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" style="color: #e74c3c;">
+                            <i class="fa fa-sign-out"></i> Đăng xuất
+                        </a>
+                        <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                            @csrf
+                        </form>
+                    </li>
+                </ul>
+            </li>
+        @endauth
+    </ul>
+</div>
             </div>
         </div>
     </nav>
