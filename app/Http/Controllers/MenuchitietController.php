@@ -7,11 +7,21 @@ use Illuminate\Http\Request;
 
 class MenuchitietController extends Controller
 {
-    public function index()
-    {
-        $menus = Menu::all();
-        return view('menu', compact('menus'));
+    public function index(Request $request)
+{
+    $query = Menu::query();
+
+    // nếu có nhập tìm kiếm
+    if ($request->has('search') && $request->search != '') {
+        $search = $request->search;
+
+        $query->where('name', 'LIKE', '%' . $search . '%');
     }
+
+    $menus = $query->get();
+
+    return view('menu', compact('menus'));
+}
 
     public function special()
     {

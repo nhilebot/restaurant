@@ -36,7 +36,7 @@ class AuthController extends Controller
         $credentials = $request->only('email', 'password');
 
         if (Auth::attempt($credentials, $request->has('remember'))) {
-            $request->session()->regenerate();
+          
             return redirect()->intended('/')->with('success', 'Đăng nhập thành công!');
         }
 

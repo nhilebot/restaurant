@@ -86,8 +86,10 @@
         </div>
 
         @if(session('success'))
-            <div class="alert alert-success" style="border-radius: 30px; font-family: sans-serif;">{{ session('success') }}</div>
-        @endif
+    <div class="alert alert-success" style="border-radius: 30px; font-family: sans-serif;">
+        {{ session('success') }}
+    </div>
+@endif
 
         @if($errors->any())
             <div class="alert alert-danger" style="border-radius: 15px; font-family: sans-serif; font-size: 13px;">

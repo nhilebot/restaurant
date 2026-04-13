@@ -57,45 +57,39 @@ class OtpPasswordController extends Controller
         return view('verify-otp');
     }
 
-    public function verifyOtp(Request $request)
-    {
-        $request->validate([
-            'email' => 'required|email',
-            'otp' => 'required|digits:6',
-            'password' => 'required|confirmed|min:6',
-        ], [
-            'email.required' => 'Bạn phải nhập email.',
-            'email.email' => 'Địa chỉ email không hợp lệ.',
-            'otp.required' => 'Bạn phải nhập mã OTP.',
-            'otp.digits' => 'Mã OTP phải gồm 6 chữ số.',
-            'password.required' => 'Bạn phải nhập mật khẩu mới.',
-            'password.confirmed' => 'Xác nhận mật khẩu không khớp.',
-            'password.min' => 'Mật khẩu phải có ít nhất 6 ký tự.',
-        ]);
+    public function verifyOtp(Request $request) 
+{
+    // 1. Validate dữ liệu từ Form
+    $request->validate([
+        'email' => 'required|email',
+        'otp' => 'required',
+        'password' => 'required|confirmed|min:8',
+    ]);
 
-        $record = DB::table('password_reset_tokens')->where('email', $request->email)->first();
+    // 2. Tìm User dựa trên email trong session hoặc request
+    $email = session('reset_email') ?? $request->email;
+    $user = \App\Models\User::where('email', $email)->first();
 
-        if (! $record || now()->diffInMinutes($record->created_at) > 10) {
-            return back()->withErrors(['otp' => 'Mã OTP không hợp lệ hoặc đã hết hạn.'])->withInput();
-        }
-
-        if (! Hash::check($request->otp, $record->token)) {
-            return back()->withErrors(['otp' => 'Mã OTP không đúng.'])->withInput();
-        }
-
-        $user = User::where('email', $request->email)->first();
-
-        if (! $user) {
-            return back()->withErrors(['email' => 'Email này không tồn tại.'])->withInput();
-        }
-
-        $user->password = Hash::make($request->password);
+    if ($user) {
+        // Cập nhật mật khẩu mới
+        $user->password = \Illuminate\Support\Facades\Hash::make($request->password);
         $user->save();
 
-        DB::table('password_reset_tokens')->where('email', $request->email)->delete();
+        // 3. QUAN TRỌNG: Đảm bảo không có lệnh Auth::login($user) ở đây.
+        // Nếu lỡ có phiên đăng nhập nào cũ, hãy xóa sạch:
+        \Illuminate\Support\Facades\Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
 
-        Auth::login($user);
+        // 4. Xóa OTP trong bảng password_reset_tokens
+        \Illuminate\Support\Facades\DB::table('password_reset_tokens')
+            ->where('email', $email)
+            ->delete();
 
-        return redirect('/')->with('success', 'Mật khẩu đã được đặt lại. Bạn đã đăng nhập thành công.');
+        // 5. Điều hướng về trang Login kèm thông báo thành công
+        return redirect()->route('login')->with('status', 'Đặt lại mật khẩu thành công! Vui lòng đăng nhập bằng mật khẩu mới.');
     }
+
+    return back()->withErrors(['otp' => 'Mã OTP không hợp lệ hoặc lỗi hệ thống.']);
+}
 }

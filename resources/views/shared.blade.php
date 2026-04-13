@@ -27,7 +27,10 @@
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                     </button>
-                    <a class="navbar-brand" href="{{ url('/') }}">Restaurant</a>
+                    <!-- <a class="navbar-brand" href="{{ url('/') }}">Restaurant</a> -->
+                    <a class="navbar-brand" href="{{ url('/') }}" style="padding: 0px 0px; display: flex; align-items: center;">
+                    <img src="{{ asset('images/logo.png') }}" alt="Món Việt Logo" style="height: 125px; width: auto; filter: drop-shadow(0px 0px 2px rgba(0,0,0,0.5));">
+</a>
                 </div>
                 <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
     <ul class="nav navbar-nav navbar-center-custom">
@@ -78,6 +81,7 @@
         </div>
     </nav>
     @yield('content')
+    
     <footer class="sub_footer">
     <div class="container">
         <div class="row">

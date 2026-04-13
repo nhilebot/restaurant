@@ -110,4 +110,6 @@ Route::middleware(['auth'])->group(function () {
 
     return 'Đã gửi mail!';
 });
+// gọi đến profile
+Route::get('/profile', [App\Http\Controllers\ProfileController::class, 'index'])->middleware('auth');
 });

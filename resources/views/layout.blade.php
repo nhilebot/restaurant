@@ -3,15 +3,31 @@
 @section('title', 'Trang chủ | Tam Nhi Quán')
 
 @section('content')
-    <div id="top" class="starter_container bg">
+   <div id="top" class="starter_container">
+    <div id="homeCarousel" class="carousel slide" data-ride="carousel" data-interval="3000">
+       
+
+        <div class="carousel-inner" role="listbox">
+            <div class="item active">
+                <div class="fill" style="background-image:url('{{ asset('images/steak.jpg') }}');"></div>
+            </div>
+            <div class="item">
+                <div class="fill" style="background-image:url('{{ asset('images/bannersl.jpg') }}');"></div>
+            </div>
+            <div class="item">
+                <div class="fill" style="background-image:url('{{ asset('images/breakfast.jpg') }}');"></div>
+            </div>
+        </div>
+
         <div class="follow_container">
             <div class="col-md-6 col-md-offset-3">
                 <h2 class="top-title">Nhà Hàng</h2>
-                <h2 class="white second-title">"Tốt nhất trong Thành Phố"</h2>
+                <h2 class="white">"Tốt Nhất Trong Thành Phố"</h2>
                 <hr>
             </div>
         </div>
     </div>
+</div>
 
     <section id="story" class="description_content">
         <div class="text-content container">

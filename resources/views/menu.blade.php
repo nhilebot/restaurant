@@ -205,11 +205,62 @@
             color: #ccc;
             cursor: not-allowed;
         }
+        /* ===== SEARCH BOX STYLE ===== */
+.search-container {
+    margin-bottom: 40px;
+}
+
+.search-box {
+    border-radius: 30px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    border: 1px solid #eee;
+    background: #fff;
+}
+
+.search-box .form-control {
+    border: none;
+    height: 50px;
+    padding-left: 25px;
+    font-size: 15px;
+    box-shadow: none;
+}
+
+.btn-search {
+    background-color: #e74c3c;
+    color: white !important;
+    border: none;
+    height: 50px;
+    padding: 0 30px;
+    font-weight: bold;
+    transition: 0.3s;
+    font-size: 14px;
+}
+
+.btn-search:hover {
+    background-color: #c0392b;
+}
     </style>
 @endsection
 
 @section('content')
 <div class="container">
+    <div class="row">
+        <div class="col-md-6 col-md-offset-3">
+            <div class="search-container">
+                <form action="{{ url('/menu') }}" method="GET">
+                    <div class="input-group search-box">
+                        <input type="text" name="search" class="form-control" placeholder="Hôm nay bạn muốn ăn gì..." value="{{ request('search') }}">
+                        <span class="input-group-btn">
+                            <button class="btn btn-search" type="submit">
+                                <i class="fa fa-search"></i> Tìm ngay
+                            </button>
+                        </span>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
     <div class="row">
         <div class="col-xs-12">
             <h1 class="section-title">Khám Phá Thực Đơn</h1>
