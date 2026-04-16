@@ -255,7 +255,7 @@ $(document).ready(function() {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
             data: {
-                food_id: foodId,
+                menu_id: foodId,
                 quantity: 1
             },
             success: function(response) {

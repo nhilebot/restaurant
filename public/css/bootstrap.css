@@ -1266,6 +1266,19 @@ pre code {
   margin-right: auto;
   margin-left: auto;
 }
+/* Tìm đến class bao quanh các ô sản phẩm */
+.row { 
+    display: flex;
+    /* flex-wrap: wrap; */
+    margin: 0 -15px;
+}
+
+/* Các ô sản phẩm con */
+.col-product {
+    flex: 0 0 25%; /* 4 cột */
+    max-width: 25%;
+    padding: 15px;
+}
 .row {
   margin-right: -15px;
   margin-left: -15px;
@@ -2597,7 +2610,7 @@ select[multiple].input-lg {
 }
 .btn:hover,
 .btn:focus {
-  color: #333;
+  color: #ffffff;
   text-decoration: none;
 }
 .btn:active,

@@ -80,7 +80,7 @@
 
                 <form action="{{ route('cart.add') }}" method="POST">
     @csrf
-    <input type="hidden" name="food_id" value="{{ $menu->id }}">
+    <input type="hidden" name="menu_id" value="{{ $menu->id }}">
     
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
@@ -104,7 +104,7 @@ function addToCart(foodId) {
         method: "POST",
         data: {
             _token: "{{ csrf_token() }}",
-            food_id: foodId,
+            menu_id: foodId,
             quantity: qty
         },
         success: function(response) {

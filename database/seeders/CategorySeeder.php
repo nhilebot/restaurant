@@ -2,17 +2,28 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB; // ✅ QUAN TRỌNG
 
 class CategorySeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
-    public function run(): void
+    public function run()
     {
-        //
-        
+        $categories = [
+            'seafood',
+            'special',
+            'salad',
+            'dessert',
+            'drink',
+            'vietnamese'
+        ];
+
+        foreach ($categories as $cat) {
+            DB::table('categories')->insert([
+                'name' => $cat,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
     }
 }

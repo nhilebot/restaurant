@@ -167,44 +167,6 @@
             background: #e74c3c;
         }
 
-        /* ===== PAGINATION ===== */
-        .pagination {
-            display: flex;
-            justify-content: center;
-            gap: 5px;
-            margin: 30px 0;
-        }
-
-        .pagination li {
-            display: inline-block;
-        }
-
-        .pagination a, .pagination span {
-            padding: 10px 15px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            text-decoration: none;
-            color: #333;
-            transition: 0.3s;
-            display: block;
-        }
-
-        .pagination a:hover {
-            background: #e74c3c;
-            color: white;
-            border-color: #e74c3c;
-        }
-
-        .pagination .active span {
-            background: #e74c3c;
-            color: white;
-            border-color: #e74c3c;
-        }
-
-        .pagination .disabled span {
-            color: #ccc;
-            cursor: not-allowed;
-        }
         /* ===== SEARCH BOX STYLE ===== */
 .search-container {
     margin-bottom: 40px;
@@ -240,6 +202,7 @@
 .btn-search:hover {
     background-color: #c0392b;
 }
+
     </style>
 @endsection
 
@@ -277,7 +240,7 @@
         <a href="{{ url('/drinks') }}" class="btn-category">Đồ uống</a>
     </div>
 
-    <div class="row">
+    <div class="row" style="display:flex; flex-wrap:wrap;">
         @foreach($menus as $menu)
         <div class="col-md-3 col-sm-6">
             <div class="menu-card">
@@ -288,8 +251,9 @@
                 <p class="price-text">{{ number_format($menu->price, 0, ',', '.') }} VNĐ</p>
                 <div class="menu-card-buttons">
                     <a href="{{ route('menu.detail', $menu->id) }}" class="btn-detail">Xem Chi Tiết</a>
-                    <button class="btn-cart add-to-cart-btn" data-food-id="{{ $menu->id }}" data-food-name="{{ $menu->name }}">
-                        <i class="fa fa-shopping-cart"></i> Thêm
+                    <button type="button"
+                    class="btn-cart add-to-cart-btn" 
+                    data-food-id="{{ $menu->id }}"> <i class="fa fa-shopping-cart"></i>
                     </button>
                 </div>
             </div>
@@ -300,105 +264,64 @@
 </div>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="{{ asset('js/bootstrap.js') }}"></script>
 
 <script>
 $(document).ready(function() {
-    console.log('Menu page loaded, jQuery version:', $.fn.jquery);
-    console.log('CSRF token:', $('meta[name="csrf-token"]').attr('content'));
-    console.log('Found', $('.add-to-cart-btn').length, 'add to cart buttons');
-    
-    // Test click event
-    $('.add-to-cart-btn').on('click', function(e) {
+    // CHỈ DÙNG MỘT ĐOẠN XỬ LÝ CLICK DUY NHẤT
+    $(document).on('click', '.add-to-cart-btn', function(e) {
         e.preventDefault();
-        console.log('Button clicked!');
-        
+
         var foodId = $(this).data('food-id');
-        var foodName = $(this).data('food-name');
         var button = $(this);
-        
-        console.log('Food ID:', foodId, 'Food Name:', foodName);
-        console.log('Route URL:', '{{ route("cart.add") }}');
-        
-        // Disable button để tránh spam click
-        button.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Đang thêm...');
-        
-        // Gửi AJAX request
+
+        // Hiệu ứng chờ khi đang xử lý
+        button.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i>');
+
         $.ajax({
-            url: '{{ route("cart.add") }}',
+            url: '{{ route("reservation.addToCart") }}', 
             method: 'POST',
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
             data: {
+                _token: '{{ csrf_token() }}',
                 food_id: foodId,
                 quantity: 1
             },
             success: function(response) {
-                console.log('AJAX success:', response);
-                // Hiển thị thông báo thành công
-                showToast('✓ ' + response.message, 'success');
-                
-                // Cập nhật số lượng giỏ hàng trong navbar nếu có
-                if (response.cart_count) {
-                    updateCartCount(response.cart_count);
+                if (response.success) {
+                    showToast('✓ ' + (response.message || 'Đã thêm vào giỏ'), 'success');
+                    
+                    // Cập nhật số lượng trên Navbar
+                    // Kiểm tra xem ID của bạn là #cart-count hay class .badge
+                    $('.badge').text(response.cartCount); 
+                    $('#cart-count').text(response.cartCount); 
+                } else {
+                    showToast('✗ ' + response.message, 'error');
                 }
-                
-                // Reset button
-                button.prop('disabled', false).html('<i class="fa fa-shopping-cart"></i> Thêm');
             },
-            error: function(xhr, status, error) {
-                console.log('AJAX error:', xhr.status, xhr.responseText, status, error);
-                var errorMessage = 'Có lỗi xảy ra khi thêm vào giỏ hàng!';
-                
-                if (xhr.status === 401) {
-                    errorMessage = 'Bạn cần đăng nhập để thêm món vào giỏ hàng!';
-                } else if (xhr.responseJSON && xhr.responseJSON.error) {
-                    errorMessage = xhr.responseJSON.error;
-                }
-                
-                showToast('✗ ' + errorMessage, 'error');
-                
-                // Reset button
-                button.prop('disabled', false).html('<i class="fa fa-shopping-cart"></i> Thêm');
+            error: function(xhr) {
+                console.error("Lỗi:", xhr.responseText);
+                showToast('✗ Lỗi hệ thống!', 'error');
+            },
+            complete: function() {
+                // Trả lại icon giỏ hàng ban đầu
+                button.prop('disabled', false).html('<i class="fa fa-shopping-cart"></i>');
             }
         });
     });
-    
-    // Hàm hiển thị toast notification
+
+    // HÀM HIỂN THỊ THÔNG BÁO TOAST
     function showToast(message, type) {
-        console.log('Showing toast:', message, type);
-        // Xóa toast cũ nếu có
         $('.toast-notification').remove();
-        
-        // Tạo toast mới
         var toastClass = type === 'error' ? 'toast-notification error' : 'toast-notification';
         var toast = $('<div class="' + toastClass + '">' + message + '</div>');
         
-        // Thêm vào body
         $('body').append(toast);
+
+        setTimeout(() => toast.addClass('show'), 100);
         
-        // Hiển thị toast
-        setTimeout(function() {
-            toast.addClass('show');
-        }, 100);
-        
-        // Tự động ẩn sau 3 giây
-        setTimeout(function() {
+        setTimeout(() => {
             toast.removeClass('show');
-            setTimeout(function() {
-                toast.remove();
-            }, 300);
+            setTimeout(() => toast.remove(), 300);
         }, 3000);
-    }
-    
-    // Hàm cập nhật số lượng giỏ hàng
-    function updateCartCount(count) {
-        console.log('Updating cart count to:', count);
-        var cartBadge = $('.navbar .badge');
-        if (cartBadge.length) {
-            cartBadge.text(count);
-        }
     }
 });
 </script>

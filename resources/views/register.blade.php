@@ -33,46 +33,44 @@
     <div class="breeze-card">
         <div class="text-center mb-4">
             <h3 class="login-title">Đăng Ký</h3>
-            <p style="color: #777; font-size: 14px; font-family: sans-serif;">Gia nhập đại gia đình Tam Nhi Quán</p>
+            <p class="subtitle-text">Gia nhập đại gia đình Tam Nhi Quán</p>
         </div>
 
         <form id="registerForm">
             @csrf
-            <div class="row">
-                <div class="col-md-12 mb-3">
-                    <label for="name" class="breeze-label">Họ và tên</label>
-                    <input id="name" type="text" name="name" class="form-control" placeholder="Nguyễn Văn A" required>
-                </div>
-
-                <div class="col-md-12 mb-3">
-                    <label for="phone" class="breeze-label">Số điện thoại</label>
-                    <input id="phone" type="text" name="phone" class="form-control" placeholder="090xxxxxxx">
-                </div>
-
-                <div class="col-md-12 mb-3">
-                    <label for="email" class="breeze-label">Email</label>
-                    <input id="email" type="email" name="email" class="form-control" placeholder="email@vi-du.com" required>
-                </div>
-
-                <div class="col-md-6 mb-3">
-                    <label for="password" class="breeze-label">Mật khẩu</label>
-                    <input id="password" type="password" name="password" class="form-control" placeholder="••••••••" required>
-                </div>
-
-                <div class="col-md-6 mb-3">
-                    <label for="password_confirmation" class="breeze-label">Xác nhận</label>
-                    <input id="password_confirmation" type="password" name="password_confirmation" class="form-control" placeholder="••••••••" required>
-                </div>
+            <div class="mb-3">
+                <label for="name" class="breeze-label">Họ và tên</label>
+                <input id="name" type="text" name="name" class="form-control" placeholder="Nguyễn Văn A" required>
             </div>
 
-            <div class="mb-4 form-check" style="font-family: sans-serif; font-size: 14px;">
+            <div class="mb-3">
+                <label for="phone" class="breeze-label">Số điện thoại</label>
+                <input id="phone" type="text" name="phone" class="form-control" placeholder="090xxxxxxx">
+            </div>
+
+            <div class="mb-3">
+                <label for="email" class="breeze-label">Email</label>
+                <input id="email" type="email" name="email" class="form-control" placeholder="email@vi-du.com" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="password" class="breeze-label">Mật khẩu</label>
+                <input id="password" type="password" name="password" class="form-control" placeholder="••••••••" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="password_confirmation" class="breeze-label">Xác nhận mật khẩu</label>
+                <input id="password_confirmation" type="password" name="password_confirmation" class="form-control" placeholder="••••••••" required>
+            </div>
+
+            <div class="mb-4 form-check custom-check">
                 <input type="checkbox" class="form-check-input" id="terms" name="terms" required>
-                <label class="form-check-label" for="terms" style="color: #4b5563; margin-left: 5px;">
+                <label class="form-check-label" for="terms">
                     Tôi đồng ý với các Điều khoản & Dịch vụ
                 </label>
             </div>
 
-            <button type="submit" id="btnSubmit" class="btn btn-breeze shadow-sm">TẠO TÀI KHOẢN</button>
+            <button type="submit" id="btnSubmit" class="btn btn-breeze">TẠO TÀI KHOẢN</button>
             
             <div class="text-center mt-4">
                 <a href="{{ route('login') }}" class="login-link">Đã có tài khoản? <strong>Đăng nhập ngay</strong></a>

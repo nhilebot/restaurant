@@ -224,7 +224,7 @@ $(document).ready(function() {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
             data: {
-                food_id: foodId,
+                menu_id: foodId,
                 quantity: 1
             },
             success: function(response) {
@@ -256,3 +256,7 @@ $(document).ready(function() {
 });
 </script>
 @endsection
+<button type="button"
+    class="btn-cart add-to-cart-btn" 
+    data-food-id="{{ $menu->id }}"> <i class="fa fa-shopping-cart"></i>
+</button>

@@ -16,7 +16,7 @@ return new class extends Migration
         // Liên kết với bảng users (người dùng phải đăng nhập)
         $table->foreignId('user_id')->constrained()->onDelete('cascade');
         // Liên kết với bảng menus (món ăn)
-        $table->foreignId('food_id')->constrained('menus')->onDelete('cascade');
+        $table->unsignedBigInteger('menu_id');
         // Số lượng món ăn
         $table->integer('quantity')->default(1);
         $table->timestamps();

@@ -104,6 +104,105 @@
             display: inline-block;
             margin-top: 10px;
         }
+        /* --- CSS FIX LỖI NHẢY HÀNG --- */
+        
+        /* 1. Chỉ áp dụng Flexbox cho hàng chứa sản phẩm, đặt tên là menu-grid */
+        .menu-grid {
+            display: flex !important;
+            flex-wrap: wrap !important;
+        }
+
+        /* 2. Đảm bảo các cột có độ cao bằng nhau để không bị kẹt hàng */
+        .menu-grid > [class*='col-'] {
+            display: flex !important;
+            float: none !important; /* Quan trọng: Bỏ float của Bootstrap 3 */
+            margin-bottom: 30px;
+        }
+
+        /* 3. Làm cho các khung trắng (menu-card) cao bằng nhau */
+        .menu-card {
+            background: #fff;
+            text-align: center;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            transition: 0.3s;
+            
+            /* Thêm 3 dòng này */
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between; 
+        }
+        
+        /* Giữ cho tên món không bị lệch nút bấm */
+        .product-name {
+            min-height: 50px; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        /* 1. ÉP HIỂN THỊ: Phá bỏ lệnh ẩn từ style-portfolio.css */
+.menu-card, .item, .col-md-3, .col-sm-6 {
+    display: block !important; 
+    opacity: 1 !important; 
+    visibility: visible !important;
+}
+
+/* 2. FIX HÀNG LỐI: Đảm bảo 25 món xếp hàng ngay ngắn (Bootstrap 3) */
+@media (min-width: 992px) {
+    .row > div:nth-child(4n+1) {
+        clear: left !important;
+    }
+}
+@media (min-width: 768px) and (max-width: 991px) {
+    .row > div:nth-child(2n+1) {
+        clear: left !important;
+    }
+}
+
+/* 3. CHỈNH CHIỀU CAO: Để các nút chi tiết không bị lệch nhau */
+.menu-card {
+    min-height: 420px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    margin-bottom: 30px;
+}
+/* 1. PHÁ BỎ LỆNH ẨN: Ép tất cả các món ăn phải hiện ra */
+    .menu-card, .item, .col-md-3, .col-sm-6 {
+        display: block !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        transform: none !important;
+    }
+
+    /* 2. FIX HÀNG LỐI: Quan trọng nhất để hiện đủ 25 món không bị lệch */
+    @media (min-width: 992px) {
+        .row > div:nth-child(4n+1) {
+            clear: left !important;
+        }
+    }
+    @media (min-width: 768px) and (max-width: 991px) {
+        .row > div:nth-child(2n+1) {
+            clear: left !important;
+        }
+    }
+
+    /* 3. ĐỒNG NHẤT CHIỀU CAO: Để các thẻ không cao thấp làm hàng bị méo */
+    .menu-card {
+        background: #fff;
+        text-align: center;
+        padding: 20px;
+        margin-bottom: 30px;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        min-height: 450px; /* Thêm dòng này */
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+    
     </style>
 </head>
 

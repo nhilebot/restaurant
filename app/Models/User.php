@@ -20,9 +20,12 @@ class User extends Authenticatable
     protected $fillable = [
     'name',
     'email',
-    'phone',
     'password',
-    'role' => 'customer', // Phải có trường này ở đây
+    'phone',
+    'role_id',
+    'address',
+    'city',
+    'avatar',
 ];
 
     /**
@@ -49,4 +52,8 @@ class User extends Authenticatable
     {
         return $this->hasMany(Order::class);
     }
+    public function role()
+{
+    return $this->belongsTo(Role::class);
+}
 }

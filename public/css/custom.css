@@ -11,7 +11,7 @@
 /* ====== BUTTON STYLE ====== */
 .btn-main {
     padding: 16px 48px;
-    border: 2px solid #e74c3c;
+    /* border: 2px solid #e74c3c; */
     color: #060606;
     text-decoration: none;
     font-size: 18px;
@@ -22,12 +22,12 @@
     display: inline-block;
     min-width: 220px;
     text-align: center;
-    background: linear-gradient(135deg, #55555585, rgb(231 76 60));
+    /* background: linear-gradient(135deg, #55555585, rgb(231 76 60)); */
     border-radius: 50px;
     box-shadow: 0 4px 15px rgba(231, 76, 60, 0.2);
     position: relative;
     overflow: hidden;
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(700px);
 }
 
 .btn-main::before {
@@ -242,4 +242,52 @@ body {
     top: 35%;
     width: 100%;
     text-align: center;
+}
+/* Triệt tiêu các float cũ của Bootstrap gây đè chữ */
+.navbar-nav, 
+.navbar-nav > li, 
+.navbar-header {
+    float: none !important;
+    display: inline-block !important;
+}
+
+/* Biến navbar-collapse thành một hàng ngang linh hoạt */
+.navbar-collapse {
+    display: flex !important;
+    justify-content: space-between !important; /* Đẩy 2 cụm ra 2 đầu */
+    align-items: center !important;
+    width: 100% !important;
+}
+
+/* Cụm menu Trang chủ - Thực đơn - Đặt bàn (Căn giữa) */
+.navbar-center-custom {
+    flex: 1;
+    text-align: center;
+    display: flex !important;
+    justify-content: center;
+    margin: 0 !important;
+}
+
+/* Cụm menu Giỏ hàng - Đơn hàng - Đăng nhập (Căn phải) */
+.navbar-right {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    margin: 0 !important;
+    justify-content: flex-end;
+}
+
+/* Điều chỉnh khoảng cách các icon và chữ cho đẹp */
+.nav > li > a {
+    /* padding: 15px 12px !important; */
+    display: flex !important;
+    align-items: center;
+    gap: 5px; /* Khoảng cách giữa icon và chữ */
+    white-space: nowrap !important; /* Không cho chữ rớt dòng */
+}
+
+/* Fix lỗi logo chiếm chỗ */
+.navbar-header {
+    display: flex !important;
+    align-items: center;
 }

@@ -9,15 +9,8 @@ class Order extends Model
 {
     use HasFactory;
 
-protected $fillable = [
-    'user_id', 
-    'table_number', 
-    'total_price', 
-    'status',
-    'name',        // Tâm thêm vào
-    'phone',       // Tâm thêm vào
-    'address'      // Tâm thêm vào
-];
+protected $fillable = ['user_id', 'total_price', 'status', 'table_number', 'name', 
+'phone', 'address', 'payment_method','notes', 'menu_id'];
 
     public function user()
     {
@@ -28,4 +21,8 @@ protected $fillable = [
     {
         return $this->hasMany(OrderItem::class);
     }
+    public function items()
+{
+    return $this->hasMany(\App\Models\OrderItem::class);
+}
 }

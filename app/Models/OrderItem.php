@@ -9,7 +9,7 @@ class OrderItem extends Model
 {
     use HasFactory;
 
-protected $fillable = ['order_id', 'menu_id', 'product_name', 'quantity', 'price'];
+protected $fillable = ['order_id', 'product_name', 'quantity', 'price', 'menu_id'];
 
     public function order()
     {
@@ -18,6 +18,8 @@ protected $fillable = ['order_id', 'menu_id', 'product_name', 'quantity', 'price
 
     public function menu()
     {
-        return $this->belongsTo(Menu::class);
+        // return $this->belongsTo(Menu::class);
+        // Liên kết cột menu_id của bảng order_items với id của bảng menus
+    return $this->belongsTo(Menu::class, 'menu_id', 'id');
     }
 }

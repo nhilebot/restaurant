@@ -221,7 +221,8 @@
     <script src="{{ asset('js/bootstrap.min.js') }}"></script>
     <script>
         // Lấy dữ liệu từ Laravel gửi sang
-        const menuItems = @json($menus); 
+        const menuItems = @json($menus ?? []);
+window.menuItems = menuItems;
         let cart = @json(array_values(session('cart', []))); 
 
         const formatCurrency = (num) => new Intl.NumberFormat('vi-VN').format(num);

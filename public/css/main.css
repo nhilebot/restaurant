@@ -931,39 +931,3 @@ body {
 .main-nav a:hover {
     color: #e74c3c !important;
 }
-/* Làm đẹp bộ phân trang */
-.pagination-custom .pagination {
-    border-radius: 50px;
-}
-
-.pagination-custom .pagination > li > a, 
-.pagination-custom .pagination > li > span {
-    color: #e74c3c; /* Màu đỏ chủ đạo */
-    background-color: #fff;
-    border: 1px solid #ddd;
-    margin: 0 4px;
-    padding: 8px 16px;
-    border-radius: 50% !important; /* Biến nút thành hình tròn */
-    font-weight: bold;
-    transition: all 0.3s;
-}
-
-/* Khi di chuột qua nút */
-.pagination-custom .pagination > li > a:hover {
-    background-color: #fceaea !important;
-    border-color: #e74c3c !important;
-    color: #e74c3c !important;
-}
-
-/* Nút đang được chọn (Active) */
-.pagination-custom .pagination > .active > span, 
-.pagination-custom .pagination > .active > span:hover {
-    background-color: #e74c3c !important;
-    border-color: #e74c3c !important;
-    color: #fff !important;
-}
-
-/* Ẩn các icon mũi tên lạ nếu có */
-.pagination svg {
-    width: 20px;
-}

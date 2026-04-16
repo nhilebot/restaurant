@@ -51,39 +51,29 @@ class AuthController extends Controller
     }
 
     // Xử lý đăng ký
-    public function register(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
-            'phone' => 'nullable|string|max:15',
-            'email' => 'required|email|unique:users',
-            'password' => 'required|min:8|confirmed',
-            'terms' => 'accepted',
-        ], [
-            'name.required' => 'Họ tên không được để trống',
-            'email.required' => 'Email không được để trống',
-            'email.email' => 'Email không hợp lệ',
-            'email.unique' => 'Email đã tồn tại',
-            'password.required' => 'Mật khẩu không được để trống',
-            'password.min' => 'Mật khẩu phải có ít nhất 8 ký tự',
-            'password.confirmed' => 'Xác nhận mật khẩu không khớp',
-            'terms.accepted' => 'Bạn phải đồng ý với điều khoản',
-        ]);
+   public function register(Request $request)
+{
+    $request->validate([
+        'name' => 'required',
+        'email' => 'required|email|unique:users,email',
+        'phone' => 'required',
+        'password' => 'required|confirmed|min:6'
+    ]);
 
-        if ($validator->fails()) {
-            return back()->withErrors($validator)->withInput();
-        }
+    // Thêm role_id vào đây để sửa lỗi SQL 1364
+    $user = User::create([
+        'name' => $request->name,
+        'email' => $request->email,
+        'phone' => $request->phone,
+        'password' => Hash::make($request->password),
+        'role_id' => 2, // Giả sử 2 là ID của khách hàng
+    ]);
 
-        $user = User::create([
-            'name' => $request->name,
-            'phone' => $request->phone,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'role' => 'customer',
-        ]);
-
-        return redirect()->route('register')->with('register_success', true);
-    }
+    return response()->json([
+        'success' => true,
+        'message' => 'Đăng ký thành công'
+    ]);
+}
 
     // Xử lý đăng xuất
     public function logout(Request $request)

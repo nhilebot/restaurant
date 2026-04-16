@@ -150,16 +150,16 @@
     <div class="customer-info">
         <div class="info-header">Thông tin người đặt hàng</div>
         <div class="info-grid">
-            <div class="info-item"><strong>Họ tên:</strong> {{ auth()->user()->name ?? 'Chưa đăng nhập' }}</div>
-            <div class="info-item"><strong>Ngày đặt:</strong> {{ date('d/m/Y') }}</div>
+            <div class="info-item"><strong>Họ tên:</strong> {{ $reservation['name'] }}</div>
+            <div class="info-item"><strong>Ngày đặt:</strong> {{ $reservation['date'] }}</div>
             <div class="info-item"><strong>Email:</strong> {{ auth()->user()->email ?? '...' }}</div>
-            <div class="info-item"><strong>Giờ đặt:</strong> {{ date('H:i') }}</div>
+            <div class="info-item"><strong>Giờ đặt:</strong> {{ $reservation['time'] }}</div>
             <div class="info-item"><strong>Số điện thoại:</strong> {{ auth()->user()->phone ?? '...' }}</div>
-            <div class="info-item"><strong>Trạng thái:</strong> <span style="color: #d9534f;">Đang chờ xác nhận</span></div>
+            <div class="info-item"><strong>Trạng thái:</strong> <span style="color: #d9534f;">{{ $reservation['status'] }}</span></div>
         </div>
     </div>
 
-    @if(session('cart') && count(session('cart')) > 0)
+    @if(isset($cart) && count($cart) > 0)
         <table class="cart-table">
             <thead>
                 <tr>
@@ -169,7 +169,7 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach(session('cart') as $id => $item)
+                @foreach($cart as $item)
                     <tr>
                         <td>
                             <div class="product-cell">
@@ -177,13 +177,7 @@
                                 <span class="product-name">{{ $item['name'] }}</span>
                             </div>
                         </td>
-                        <td style="text-align: center;">
-                            <div class="quantity-control" style="justify-content: center;">
-                                <button class="qty-btn">-</button>
-                                <span style="margin: 0 10px; font-weight: bold;">{{ $item['quantity'] }}</span>
-                                <button class="qty-btn">+</button>
-                            </div>
-                        </td>
+                        <td style="text-align: center;">{{ $item['quantity'] }}</td>
                         <td style="text-align: right; font-weight: bold;">
                             {{ number_format($item['price'], 0, ',', '.') }}₫
                         </td>
@@ -194,25 +188,47 @@
 
         <div class="cart-summary">
             <strong>Tổng cộng: </strong>
-            <span class="total-amount">
-                {{ number_format(collect(session('cart'))->sum(fn($i) => $i['price'] * $i['quantity']), 0, ',', '.') }} VNĐ
-            </span>
+            <span class="total-amount">{{ number_format($total, 0, ',', '.') }} VNĐ</span>
         </div>
 
         <div class="note-section">
             <label>Ghi chú</label>
-            <textarea rows="3" placeholder="Ví dụ: Ít cay, không lấy hành..."></textarea>
+            <textarea id="order-notes" rows="3" placeholder="Ví dụ: Ít cay, không lấy hành...">{{ $reservation['notes'] }}</textarea>
         </div>
 
         <div style="margin-top: 30px; text-align: center;">
-            <button style="background: #d9534f; color: white; border: none; padding: 12px 30px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 16px;">
-                XÁC NHẬN ĐẶT MÓN
-            </button>
+<form action="{{ route('cart.checkout') }}" method="POST">
+@csrf
+
+<div class="cart-container">
+
+    <!-- hidden -->
+    <input type="hidden" name="total_price" value="{{ $total }}">
+    <input type="hidden" name="table_number" value="{{ $reservation['table'] }}">
+
+    <!-- TABLE -->
+    <table>...</table>
+
+    <!-- NOTE -->
+    <div class="note-section">
+        <label>Ghi chú</label>
+        <textarea name="order_notes">test 123</textarea>
+    </div>
+
+    <!-- PAYMENT -->
+    <input type="radio" name="payment_method" value="COD" checked>
+
+    <!-- SUBMIT -->
+    <button type="submit">Thanh toán</button>
+
+</div>
+</form>
         </div>
     @else
         <div style="text-align: center; padding: 40px; color: #888;">
             <i class="fas fa-shopping-basket" style="font-size: 40px; margin-bottom: 10px;"></i>
             <p>Giỏ hàng của bạn đang trống!</p>
+            <a href="{{ route('menu.index') }}" style="color: #d9534f; font-weight: bold;">Quay lại đặt món</a>
         </div>
     @endif
 </div>

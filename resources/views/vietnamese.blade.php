@@ -1,23 +1,19 @@
 @extends('shared')
 
-@section('title', 'Thực đơn Salad - Restaurant')
+@section('title', 'Thực đơn Hải sản - Restaurant')
 
 @section('head')
 <style>
         body { background-color: #f9f9f9; padding-top: 100px; }
-        
         .navbar-default {
             background-color: #fff;
             border: none !important;
             box-shadow: 0 2px 10px rgba(0,0,0,0.05) !important;
         }
-
-        /* Thêm style để khi hover vào Logo vẫn giữ màu đẹp hoặc đổi nhẹ */
         .navbar-brand:hover {
             color: #f1f1f1 !important; 
             opacity: 0.8;
         }
-
         .section-title {
             font-family: 'Pacifico', cursive;
             font-size: 60px;
@@ -32,14 +28,12 @@
             outline: none !important;
             text-transform: none;
         }
-
         @media (max-width: 768px) {
             .section-title {
                 font-size: 40px;
                 white-space: normal;
             }
         }
-
         .section-subtitle {
             text-align: center;
             color: #777;
@@ -48,7 +42,6 @@
             font-size: 16px;
             line-height: 1.6;
         }
-
         .category-nav { margin-bottom: 50px; text-align: center; }
         .btn-category {
             padding: 10px 22px;
@@ -68,7 +61,6 @@
             color: white !important;
             text-decoration: none;
         }
-
         .menu-card { 
             background: #fff;
             margin-bottom: 30px; 
@@ -78,12 +70,10 @@
             border-radius: 15px;
             box-shadow: 0 5px 15px rgba(0,0,0,0.05);
         }
-        
         .menu-card:hover { 
             transform: translateY(-10px); 
             box-shadow: 0 15px 30px rgba(0,0,0,0.1);
         }
-
         .product-img {
             width: 180px;
             height: 180px;
@@ -92,26 +82,23 @@
             border: 6px solid #fff2f2;
             transition: 0.5s;
         }
-        
         .menu-card:hover .product-img {
             border-color: #e74c3c;
             transform: rotate(5deg);
         }
-
         .product-name { 
             font-family: 'Playball', cursive;
             font-size: 22px; 
             color: #333; 
             margin-top: 15px; 
         }
-
         .price-text { 
             font-size: 18px; 
             color: #e74c3c; 
             font-weight: bold; 
             margin: 8px 0; 
         }
-
+        
         /* STYLE CHO CỤM NÚT */
         .menu-card-buttons {
             display: flex;
@@ -172,61 +159,18 @@
         }
         .toast-notification.show { opacity: 1; transform: translateX(0); }
         .toast-notification.error { background: #e74c3c; }
-
-        /* ===== PAGINATION ===== */
-        .pagination {
-            display: flex;
-            justify-content: center;
-            gap: 5px;
-            margin: 30px 0;
-        }
-
-        .pagination li {
-            display: inline-block;
-        }
-
-        .pagination a, .pagination span {
-            padding: 10px 15px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            text-decoration: none;
-            color: #333;
-            transition: 0.3s;
-            display: block;
-        }
-
-        .pagination a:hover {
-            background: #e74c3c;
-            color: white;
-            border-color: #e74c3c;
-        }
-
-        .pagination .active span {
-            background: #e74c3c;
-            color: white;
-            border-color: #e74c3c;
-        }
-
-        .pagination .disabled span {
-            color: #ccc;
-            cursor: not-allowed;
-        }
-
     </style>
 @endsection
 
 @section('content')
 <div class="container">
     <div class="row">
-        <div class="row">
         <div class="col-xs-12">
             <h1 class="section-title">Thực Đơn Món Việt</h1>
             <p class="section-subtitle">
-                Ẩm thực Việt tại Nhà Hàng mang đến hương vị truyền thống đậm đà,
-                kết hợp tinh tế giữa nguyên liệu tươi ngon và cách chế biến đặc trưng.
+                Ẩm thực Việt tại Nhà Hàng mang đến hương vị truyền thống đậm đà, kết hợp tinh tế giữa nguyên liệu tươi ngon và cách chế biến đặc trưng.
             </p>
         </div>
-    </div>
     </div>
     
     <div class="category-nav">
@@ -280,7 +224,7 @@ $(document).ready(function() {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
             data: {
-                food_id: foodId,
+                menu_id: foodId,
                 quantity: 1
             },
             success: function(response) {

@@ -53,6 +53,13 @@
         .cart-item-img { width: 50px; height: 50px; border-radius: 5px; object-fit: cover; }
         .table-item label:hover { border-color: #d9534f; background-color: #fff5f5; transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
         .table-item input[type="radio"]:disabled + label:hover { border-color: #ddd; background-color: #eee; transform: none; box-shadow: none; }
+        /* CSS bổ sung vào file reservation.blade.php */
+input[disabled] + label {
+    background-color: #cccccc !important;
+    color: #666666 !important;
+    cursor: not-allowed !important;
+    border: 1px solid #999 !important;
+}
     </style>
 @endsection
 
@@ -93,22 +100,31 @@
 
                         <label class="label-custom">Vị trí bàn</label>
                         <div class="table-selection-grid">
-                            @for ($i = 1; $i <= 10; $i++)
-                                @php $isBooked = in_array($i, $bookedTableIds ?? []); @endphp
-                                <div class="table-item">
-                                    <input type="radio" name="table_id" id="t{{$i}}" value="{{$i}}" {{ $isBooked ? 'disabled' : '' }} required>
-                                    <label for="t{{$i}}" style="{{ $isBooked ? 'background-color: #eee; color: #aaa; cursor: not-allowed;' : '' }}">
-                                        Bàn {{$i}} <br>
-                                        <small style="font-size: 10px;">{{ $isBooked ? 'Đã đặt' : 'Trống' }}</small>
-                                    </label>
-                                </div>
-                            @endfor
+                           @for ($i = 1; $i <= 10; $i++)
+    <div class="table-item">
+        <input type="radio"
+    name="table_id"
+    value="{{ $i }}"
+    id="table{{ $i }}"
+    {{ in_array($i, $bookedTableIds) ? 'disabled' : '' }}>
+        
+        <label for="table{{ $i }}" class="{{ in_array($i, $bookedTableIds) ? 'booked-style' : '' }}">
+            Bàn {{ $i }}
+            @if(in_array($i, $bookedTableIds))
+    <small style="color:red;">(Đã đặt)</small>
+@else
+    <small style="color:green;">(Trống)</small>
+@endif
+        </label>
+    </div>
+@endfor
                         </div>
 
                         <label class="label-custom">Thực đơn đặt trước</label>
-                        <button type="button" class="btn-food-select" id="openFoodModalBtn">
-                            <i class="fa fa-search"></i> TÌM KIẾM VÀ CHỌN MÓN ĂN
-                        </button>
+                        <button type="button" class="btn-food-select" id="openFoodModalBtn" 
+        data-toggle="modal" data-target="#foodMenuModal">
+    <i class="fa fa-search"></i> TÌM KIẾM VÀ CHỌN MÓN ĂN
+</button>
 
                         <div id="cart-container" class="cart-wrapper" style="display: none;">
                             <h5 class="label-custom" style="margin-top: 0; color: #d9534f;">Món ăn đã chọn:</h5>
@@ -160,8 +176,9 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         // 1. Khởi tạo dữ liệu (Giữ nguyên của Nhi)
-        const menuItems = @json($menus);
-        let cart = @json(array_values(session('cart', [])));
+        const menuItems = @json($menus ?? []);
+        let cart = @json($cart ?? []);
+window.cart = cart;
         const formatCurrency = (num) => new Intl.NumberFormat('vi-VN').format(num);
         const getImageUrl = (image) => {
             if (!image) return 'https://via.placeholder.com/200x160?text=No+Image';
@@ -250,13 +267,16 @@
             const item = menuItems.find(i => i.id === id);
             if (!item) return;
 
-            fetch("{{ route('cart.addAjax') }}", {
+            fetch("{{ route('reservation.addToCart') }}", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                     "X-CSRF-TOKEN": "{{ csrf_token() }}"
                 },
-                body: JSON.stringify({ id: item.id, name: item.name, price: item.price, image: item.image })
+                body: JSON.stringify({ 
+                food_id: item.id,   // ✅ ĐÚNG
+                quantity: 1         // ✅ thêm luôn cho chắc
+            })
             })
             .then(res => res.json())
             .then(data => {
@@ -321,48 +341,49 @@
 
         // 5. Hàm cập nhật UI AN TOÀN (Đã thêm kiểm tra NULL)
         function updateCartUI() {
-            const container = document.getElementById('cart-container');
-            const list = document.getElementById('cart-list');
-            const hidden = document.getElementById('hidden-inputs-container');
-            const totalPriceElement = document.getElementById('total-price');
-            
-            // Nếu các thẻ này không tồn tại trên trang thì thoát ra để không báo lỗi
-            if (!container || !list || !hidden) return; 
+    const container = document.getElementById('cart-container');
+    const list = document.getElementById('cart-list');
+    const hidden = document.getElementById('hidden-inputs-container');
+    const totalPriceElement = document.getElementById('total-price');
+    
+    if (!container || !list || !hidden) return; 
 
-            let total = 0, cartHtml = '', inputsHtml = '';
+    let total = 0, cartHtml = '', inputsHtml = '';
 
-            cart.forEach(item => {
-                total += item.price * item.quantity;
-                cartHtml += `
-                    <div class="cart-item" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; border-bottom:1px dashed #eee; padding-bottom:5px;">
-                        <div style="display:flex; align-items:center; gap:10px;">
-                            <img src="${getImageUrl(item.image)}" style="width:40px; height:40px; border-radius:4px;" alt="${item.name}">
-                            <span>${item.name}</span>
-                        </div>
-                        <div>
-                            <button type="button" onclick="updateQuantity(${item.id}, -1)">-</button>
-                            <span style="padding:0 5px;">${item.quantity}</span>
-                            <button type="button" onclick="updateQuantity(${item.id}, 1)">+</button>
-                        </div>
-                    </div>`;
+    cart.forEach(item => {
+        total += item.price * item.quantity;
+        
+        // --- SỬA ĐOẠN NÀY ---
+        cartHtml += `
+            <div class="cart-item" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; border-bottom:1px dashed #eee; padding-bottom:5px;">
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <img src="${getImageUrl(item.image)}" style="width:40px; height:40px; border-radius:4px;" alt="${item.name}">
+                    <span>${item.name}</span>
+                </div>
+                <div>
+                    <button type="button" onclick="updateQuantity(${item.id}, -1)">-</button>
+                    <span style="padding:0 5px;">${item.quantity}</span>
+                    <button type="button" onclick="updateQuantity(${item.id}, 1)">+</button>
+                </div>
+            </div>`;
+        // --- HẾT ĐOẠN SỬA ---
 
-                inputsHtml += `
-                    <input type="hidden" name="cart[${item.id}][id]" value="${item.id}">
-                    <input type="hidden" name="cart[${item.id}][name]" value="${item.name}">
-                    <input type="hidden" name="cart[${item.id}][quantity]" value="${item.quantity}">
-                    <input type="hidden" name="cart[${item.id}][price]" value="${item.price}">
-                    <input type="hidden" name="cart[${item.id}][image]" value="${item.image}">`;
-            });
+        inputsHtml += `
+            <input type="hidden" name="cart[${item.id}][id]" value="${item.id}">
+            <input type="hidden" name="cart[${item.id}][name]" value="${item.name}">
+            <input type="hidden" name="cart[${item.id}][quantity]" value="${item.quantity}">
+            <input type="hidden" name="cart[${item.id}][price]" value="${item.price}">
+            <input type="hidden" name="cart[${item.id}][image]" value="${item.image}">`;
+    });
 
-            container.style.display = cart.length > 0 ? 'block' : 'none';
-            list.innerHTML = cartHtml;
-            hidden.innerHTML = inputsHtml;
+    container.style.display = cart.length > 0 ? 'block' : 'none';
+    list.innerHTML = cartHtml;
+    hidden.innerHTML = inputsHtml;
 
-            if (totalPriceElement) {
-                totalPriceElement.innerText = formatCurrency(total);
-            }
-        }
-
+    if (totalPriceElement) {
+        totalPriceElement.innerText = formatCurrency(total);
+    }
+}
         function filterMenu() { 
             renderMenu(document.getElementById('menuSearch').value); 
         }
