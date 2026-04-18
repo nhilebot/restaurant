@@ -31,8 +31,8 @@ class UserSeeder extends Seeder
             ],
             [
                 'role_id' => 3,
-                'name' => 'Nguyen Van A',
-                'email' => 'user@gmail.com',
+                'name' => 'Lê Yến Nhi',
+                'email' => 'leyennhi22122006@gmail.com',
                 'phone' => '0123456789',
                 'password' => Hash::make('123456'),
                 'created_at' => now(),

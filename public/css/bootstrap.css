@@ -1269,7 +1269,7 @@ pre code {
 /* Tìm đến class bao quanh các ô sản phẩm */
 .row { 
     display: flex;
-    /* flex-wrap: wrap; */
+    flex-wrap: wrap;
     margin: 0 -15px;
 }
 
@@ -4378,7 +4378,7 @@ a.label:focus {
   text-align: center;
   white-space: nowrap;
   vertical-align: baseline;
-  background-color: #777;
+  background-color: #00c127ab;
   border-radius: 10px;
 }
 .badge:empty {
@@ -5847,43 +5847,77 @@ button.close {
     display: table-cell !important;
   }
 }
-/* Căn giữa menu chính trên màn hình máy tính */
+/* Tìm và thay thế đoạn cũ bằng đoạn này */
 @media (min-width: 768px) {
     .navbar-collapse {
         display: flex !important;
         align-items: center;
-        justify-content: space-between;
+        justify-content: space-between; /* Đẩy các nhóm ra xa nhau */
     }
 
     .navbar-center-custom {
-        position: absolute;
-        left: 50%;
-        transform: translateX(-50%);
-        margin: 0;
+        /* Bỏ position absolute cũ đi */
+        position: relative; 
+        left: 0;
+        transform: none;
+        
         display: flex;
-        list-style: none; /* Bỏ chấm tròn nếu có */
-    }
-
-    /* ĐÂY LÀ PHẦN CHỈNH GIÃN RA XA */
-    .navbar-center-custom li a {
-        padding-left: 50px !important; 
-        padding-right: 50px !important;
-        transition: all 0.3s; /* Thêm hiệu ứng mượt khi hover */
-    }
-    
-    .nav.navbar-nav {
-        float: none;
-        vertical-align: middle;
-    }
-}
-
-/* Fix lỗi hiển thị trên mobile */
-@media (max-width: 767px) {
-    .navbar-center-custom {
-        text-align: center;
+        flex-grow: 1; /* Cho phép vùng này chiếm không gian trống */
+        justify-content: center; /* Căn giữa các mục bên trong */
+        list-style: none;
+        margin: 0;
         padding: 0;
     }
+
     .navbar-center-custom li {
-        display: block;
+        margin: 0 15px; /* Tạo khoảng cách an toàn giữa các chữ */
     }
+}
+/* Khóa thanh điều hướng trên một hàng */
+.navbar-collapse {
+    display: flex !important;
+    flex-wrap: nowrap !important; /* Tuyệt đối không cho xuống dòng */
+}
+
+/* Xử lý menu ở giữa */
+.navbar-center-custom {
+    position: static !important; /* Bỏ absolute cũ của Nhi */
+    transform: none !important;
+    text-align: center;
+}
+
+/* Xử lý menu bên phải */
+.navbar-right {
+    position: static !important;
+    display: flex !important;
+    flex-direction: row !important; /* Ép icon và chữ nằm ngang */
+}
+
+/* Khoảng cách các mục */
+.nav > li > a {
+    padding-top: 15px !important;
+    padding-bottom: 15px !important;
+    white-space: nowrap; /* Chữ không được tự ngắt dòng */
+}
+
+/* Sửa badge giỏ hàng */
+.badge {
+    font-size: 10px;
+    padding: 2px 5px;
+    vertical-align: top;
+}
+/* Đoạn code này sẽ tự động vô hiệu hóa position, left và transform cũ */
+.navbar-center-custom, .navbar-right {
+    position: static !important; 
+    left: auto !important;
+    transform: none !important;
+    float: none !important;
+    display: flex !important;
+    align-items: center !important;
+}
+
+.navbar-collapse {
+    display: flex !important;
+    justify-content: space-between !important;
+    flex-wrap: nowrap !important; /* Ép logo - menu - user cùng 1 hàng */
 }

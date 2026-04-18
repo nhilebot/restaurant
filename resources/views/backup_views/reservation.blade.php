@@ -170,8 +170,8 @@
 
                         <label class="label-custom">Thực đơn đặt trước</label>
                         <button type="button" class="btn-food-select" data-toggle="modal" data-target="#foodMenuModal">
-                            <i class="fa fa-search"></i> TÌM KIẾM VÀ CHỌN MÓN ĂN
-                        </button>
+    <i class="fa fa-search"></i> TÌM KIẾM VÀ CHỌN MÓN ĂN
+</button>
 
                         <div id="cart-container" class="cart-wrapper" style="display: none;">
                             <h5 class="label-custom" style="margin-top: 0; color: #d9534f;">Món ăn đã chọn:</h5>

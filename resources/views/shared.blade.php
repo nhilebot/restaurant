@@ -34,59 +34,54 @@
                             <img src="{{ asset('images/logo.png') }}" alt="Món Việt Logo" style="height: 125px; width: auto; filter: drop-shadow(0px 0px 2px rgba(0,0,0,0.5));">
                         </a>
                     </div>
-                    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-                        <ul class="nav navbar-nav navbar-center-custom">
-                            <li><a class="color_animation" href="{{ url('/') }}">Trang chủ</a></li>
-                            <li><a class="color_animation" href="{{ url('/menu') }}">Thực đơn</a></li>
-                            <li><a class="color_animation" href="{{ url('/reservation') }}">Đặt bàn</a></li>
-                        </ul>
-                        <ul class="nav navbar-nav navbar-right">
-                            <li>
-    <a class="color_animation" href="{{ url('/cart') }}" style="position: relative;">
-        <i class="fa fa-shopping-cart"></i>
+                    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1" style="display: flex !important; justify-content: space-between; align-items: center;">
+    
+    <div class="navbar-header" style="flex: 1;"></div>
 
-        @php
-            $count = \App\Models\Cart::where('user_id', auth()->id())->sum('quantity');
-        @endphp
+    <ul class="nav navbar-nav navbar-center-custom" style="flex: 2; display: flex; justify-content: center; float: none; margin: 0;">
+        <li><a class="color_animation" href="{{ url('/') }}">TRANG CHỦ</a></li>
+        <li><a class="color_animation" href="{{ url('/menu') }}">THỰC ĐƠN</a></li>
+        <li><a class="color_animation" href="{{ url('/reservation') }}">ĐẶT BÀN</a></li>
+    </ul>
 
-        <span class="badge badge-danger" id="cart-count"
-              style="background:red; color:white; position:absolute; top:0; right:0;">
-            {{ session()->has('cart') ? count(session('cart')) : 0 }}
-        </span>
-    </a>
-</li>
-                            @guest
-                                <li><a class="color_animation" href="{{ route('login') }}">Đăng nhập</a></li>
-                                <li><a class="color_animation" href="{{ route('register') }}">Đăng ký</a></li>
-                            @endguest
-                            @auth
-                                <li>
-                                    <a class="color_animation" href="{{ url('/order-history') }}" title="Lịch sử đơn hàng">
-                                        <i class="fa fa-file-text"></i>&nbsp; Đơn hàng
-                                    </a>
-                                </li>
-                                <li class="dropdown">
-                                    <a href="#" class="dropdown-toggle color_animation" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-                                        <i class="fa fa-user"></i> {{ Auth::user()->name }} <span class="caret"></span>
-                                    </a>
-                                    <ul class="dropdown-menu">
-                                        @if(Auth::user()->role == 'admin')
-                                            <li><a href="{{ url('/admin') }}">Quản trị viên</a></li>
-                                        @endif
-                                        <li><a href="{{ url('/profile') }}">Hồ sơ của tôi</a></li>
-                                        <li>
-                                            <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" style="color: #e74c3c;">
-                                                <i class="fa fa-sign-out"></i> Đăng xuất
-                                            </a>
-                                            <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-                                                @csrf
-                                            </form>
-                                        </li>
-                                    </ul>
-                                </li>
-                            @endauth
-                        </ul>
-                    </div>
+    <ul class="nav navbar-nav navbar-right" style="flex: 1; display: flex; justify-content: flex-end; align-items: center; float: none; margin: 0;">
+        <li>
+            <a class="color_animation" href="{{ url('/cart') }}" style="display: flex; align-items: center; position: relative; padding: 10px;">
+                <i class="fa fa-shopping-cart"></i>
+                @php $count = \App\Models\Cart::where('user_id', auth()->id())->sum('quantity'); @endphp
+                <span class="badge" style="background:red; color:white; margin-left: 5px;">{{ $count ?? 0 }}</span>
+            </a>
+        </li>
+        @guest
+            <li>
+                <a class="color_animation" href="{{ route('login') }}" style="white-space: nowrap; padding: 10px; font-weight: 600; color: #2c5c7c;">
+                    <i class="fa fa-sign-in"></i> ĐĂNG NHẬP
+                </a>
+            </li>
+            <li>
+                <a class="color_animation" href="{{ route('register') }}" style="white-space: nowrap; padding: 10px; font-weight: 600; color: #d9534f;">
+                    <i class="fa fa-user-plus"></i> ĐĂNG KÝ
+                </a>
+            </li>
+        @endguest
+        @auth
+            <li>
+                <a class="color_animation" href="{{ url('/order-history') }}" style="white-space: nowrap; padding: 10px;">
+                    <i class="fa fa-file-text"></i> ĐƠN HÀNG
+                </a>
+            </li>
+            <li class="dropdown">
+                <a href="#" class="dropdown-toggle color_animation" data-toggle="dropdown" style="white-space: nowrap; padding: 10px;">
+                    <i class="fa fa-user"></i> {{ Auth::user()->name }} <span class="caret"></span>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-right">
+                    <li><a href="{{ url('/profile') }}">Hồ sơ</a></li>
+                    <li><a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" style="color: red;">Đăng xuất</a></li>
+                </ul>
+            </li>
+        @endauth
+    </ul>
+</div>
                 </div>
             </div>
         </nav>
@@ -136,9 +131,16 @@
         </div>
     </footer>
 
-    <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+    {{-- FORM ĐĂNG XUẤT (ẩn) --}}
+    @auth
+    <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+        @csrf
+    </form>
+    @endauth
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>    
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
     <script src="{{ asset('js/main.js') }}"></script>
     @yield('scripts')
 </body>

@@ -228,7 +228,7 @@
 <div class="container">
     <div class="row">
         <div class="col-xs-12">
-            <h1 class="section-title">Món Đặc Biệt</h1>
+            <h1 class="section-title">Món đặc biệt</h1>
             <p class="section-subtitle">
                 Việt Nam luôn khiến du khách phải "thương nhớ" bởi vô vàn đặc sản mang đậm hương vị và bản sắc văn hóa từng vùng miền. 
                 Cùng khám phá những món ăn Việt Nam nổi tiếng đã chinh phục cả thế giới nhé!

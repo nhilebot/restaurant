@@ -36,8 +36,10 @@ class AuthController extends Controller
         $credentials = $request->only('email', 'password');
 
         if (Auth::attempt($credentials, $request->has('remember'))) {
-          
-            return redirect()->intended('/')->with('success', 'Đăng nhập thành công!');
+            $request->session()->regenerate();
+            $user = Auth::user();
+            $fallback = $user && $user->role_id === 1 ? route('admin.index') : url('/');
+            return redirect()->intended($fallback)->with('success', 'Đăng nhập thành công!');
         }
 
         return back()->withErrors(['email' => 'Email hoặc mật khẩu không chính xác'])

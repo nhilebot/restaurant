@@ -1,104 +1,307 @@
 @extends('shared')
 
-@section('title', '{{ $menu->name }} - Chi tiết món ăn')
+@section('title', $menu->name . ' - Chi tiết món ăn')
 
 @section('head')
 <style>
-        /* GIỮ NGUYÊN STYLE CỦA BẠN VÀ THÊM PHẦN ĐỒNG BỘ */
-        body { font-family: 'Arial', sans-serif; background-color: #fff; padding-top: 100px; }
-        /* Navbar đen đồng bộ */
-        .navbar-default { background-color: #222 !important; border: none !important; }
-        .navbar-brand { font-family: 'Pacifico' !important; font-size: 28px !important; color: #ffffff !important; }
-        .nav li a { color: #fff !important; font-weight: 600; }
-        .nav li a:hover { color: #e74c3c !important; }
-        /* Style nội dung của bạn */
-        .product-container { margin-top: 50px; margin-bottom: 50px; }
-        .image-section { position: relative; text-align: center; }
-        .image-section img {
-            width: 450px; height: 450px; object-fit: cover;
-            border-radius: 50% 40% 50% 40%; border: 10px solid #fff5f5;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
-        }
-        .sale-tag {
-            position: absolute; top: 20px; right: 15%; background: #ff0000;
-            color: #fff; padding: 10px; border-radius: 50%; font-weight: bold;
-            font-size: 12px; transform: rotate(-10deg); line-height: 1.2;
-        }
-        .info-section { padding-left: 40px; }
-        .info-section h1 {
-            font-size: 42px; font-weight: bold; color: #2c3e50;
-            margin-bottom: 25px; border-left: 5px solid #eee; padding-left: 15px;
-        }
-        .price-bar {
-            background-color: #fff0f3; padding: 15px 20px; border-radius: 4px;
-            display: flex; align-items: center; margin-bottom: 25px;
-        }
-        .price-text { font-size: 26px; font-weight: bold; color: #333; margin-right: 30px; }
-        .rating-badge { background: #d9534f; color: white; padding: 2px 8px; border-radius: 3px; font-size: 14px; }
-        .meta-info { margin-left: 20px; color: #888; font-size: 14px; }
-        .description { font-size: 18px; color: #666; margin-bottom: 30px; font-style: italic; }
-        .quantity-row { display: flex; margin-bottom: 30px; align-items: flex-end; }
-        .qty-box { margin-right: 30px; }
-        .qty-box label { display: block; font-weight: bold; margin-bottom: 10px; }
-        .qty-box input { width: 60px; padding: 5px; text-align: center; border: 1px solid #ddd; background: #fff5f5; }
-        .btn-order {
-            background-color: #d9534f; color: white !important; padding: 12px 35px;
-            font-size: 18px; border: none; border-radius: 6px; transition: 0.3s;
-            text-decoration: none; display: inline-block; cursor: pointer;
-        }
-        .btn-order:hover { background-color: #c9302c; text-decoration: none; }
-        .login-notice { color: #d9534f; font-weight: bold; margin-bottom: 15px; }
-        .btn-home { background-color: #6c757d; color: white !important; }
-    </style>
+    body { background-color: #f9f9f9; padding-top: 100px; }
+
+    /* Navbar đồng bộ */
+    .navbar-default {
+        background-color: #fff;
+        border: none !important;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05) !important;
+    }
+
+    /* Container chính */
+    .product-detail-container {
+        background: #ffffff;
+        border-radius: 20px;
+        padding: 40px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        margin-top: 30px;
+        margin-bottom: 50px;
+    }
+
+    /* Khung ảnh vuông 1:1 đồng bộ với trang chủ */
+    .detail-image-wrapper {
+        position: relative;
+        width: 100%;
+        padding-bottom: 100%; /* Tạo khung vuông */
+        overflow: hidden;
+        border-radius: 20px;
+        background-color: #fcfcfc;
+        border: 1px solid #f0f0f0;
+    }
+
+    .detail-image-wrapper img {
+        position: absolute;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        object-fit: cover;
+        transition: transform 0.6s ease;
+    }
+
+    .detail-image-wrapper:hover img {
+        transform: scale(1.05);
+    }
+
+    .sale-badge {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        background: linear-gradient(135deg, #e74c3c, #ff5e57);
+        color: white;
+        padding: 15px 10px;
+        border-radius: 50%;
+        font-weight: bold;
+        z-index: 10;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        text-align: center;
+        line-height: 1.2;
+    }
+
+    /* Phần thông tin món ăn */
+    .info-section h1 {
+        font-family: 'Playball', cursive;
+        font-size: 48px;
+        color: #333;
+        margin-top: 0;
+        margin-bottom: 20px;
+    }
+
+    .price-tag {
+        font-size: 32px;
+        color: #e74c3c;
+        font-weight: 800;
+        margin-bottom: 25px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .rating-stars {
+        font-size: 16px;
+        background: #fff4f1;
+        padding: 5px 15px;
+        border-radius: 30px;
+        color: #e74c3c;
+    }
+
+    .description-text {
+        font-size: 17px;
+        color: #666;
+        line-height: 1.8;
+        margin-bottom: 30px;
+        border-left: 4px solid #e74c3c;
+        padding-left: 20px;
+    }
+
+    /* Form đặt hàng */
+    .order-controls {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        padding: 25px 0;
+        border-top: 1px dashed #eee;
+    }
+
+    .qty-input-group {
+        display: flex;
+        align-items: center;
+        border: 2px solid #eee;
+        border-radius: 30px;
+        overflow: hidden;
+    }
+
+    .qty-input-group input {
+        width: 60px;
+        height: 45px;
+        border: none;
+        text-align: center;
+        font-weight: bold;
+    }
+
+    .btn-add-cart {
+        background: #e74c3c;
+        color: white !important;
+        border: none;
+        padding: 12px 35px;
+        border-radius: 30px;
+        font-weight: bold;
+        text-transform: uppercase;
+        transition: 0.3s;
+        box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+    }
+
+    .btn-add-cart:hover {
+        background: #c0392b;
+        transform: translateY(-2px);
+    }
+
+    /* Phần bình luận đồng bộ */
+    .comments-container {
+        margin-top: 50px;
+        background: #fff;
+        border-radius: 20px;
+        padding: 30px;
+    }
+
+    .comment-item {
+        padding: 20px 0;
+        border-bottom: 1px solid #f5f5f5;
+        display: flex;
+        gap: 15px;
+    }
+
+    .avatar-circle {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+
+    .comment-form-box {
+        background: #fdfdfd;
+        padding: 20px;
+        border-radius: 15px;
+        border: 1px solid #f0f0f0;
+        margin-bottom: 30px;
+    }
+
+    .comment-textarea {
+        width: 100%;
+        border: 1px solid #eee;
+        border-radius: 10px;
+        padding: 15px;
+        margin-bottom: 10px;
+    }
+</style>
 @endsection
 
 @section('content')
-<div class="container product-container">
-    <div class="row">
-        <div class="col-md-6 image-section">
-            <div style="position: relative; display: inline-block;">
-                <img src="{{ asset($menu->image) }}" alt="{{ $menu->name }}">
-                <div class="sale-tag">SALE<br>50%<br>OFF</div>
+<div class="container">
+    <div class="product-detail-container">
+        <div class="row">
+            <div class="col-md-5">
+                <div class="detail-image-wrapper">
+                    <img src="{{ asset($menu->image) }}" alt="{{ $menu->name }}">
+                    <!-- <div class="sale-badge">SALE<br>50%</div> -->
+                </div>
             </div>
-        </div>
 
-        <div class="col-md-6">
-            <h1 style="font-family: 'Playball', cursive; color: #333; margin-top: 0; margin-bottom: 25px;">
-    {{ $menu->name }}
-</h1>
-
-            <div class="product-info-box" style="background: #fff; padding: 30px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
-                <div class="price-bar">
-                    <span class="price-text">{{ number_format($menu->price, 0, ',', '.') }} VNĐ</span>
-                    <span class="label label-danger" style="margin-left: 15px;">5 <i class="fa fa-star"></i></span>
-                    <span style="margin-left: 15px; color: #e74c3c;"><i class="fa fa-heart"></i> 200+ Thích</span>
+            <div class="col-md-7 info-section">
+                <h1>{{ $menu->name }}</h1>
+                
+                <div class="price-tag">
+                    {{ number_format($menu->price, 0, ',', '.') }} VNĐ
+                    <span class="rating-stars">
+                        5.0 <i class="fa fa-star"></i> 
+                        <span style="color: #999; font-size: 13px; margin-left: 10px;">
+                            ({{ $menu->comments->count() }} đánh giá)
+                        </span>
+                    </span>
                 </div>
 
-                <p style="font-size: 16px; color: #666; line-height: 1.8; margin-bottom: 30px;">
-                    {{ $menu->description ?? 'Đại tiệc ẩm thực tươi ngon mang hương vị biển cả đến bàn ăn của bạn.' }}
-                </p>
+                <div class="description-text">
+                    {{ $menu->description ?? 'Thưởng thức hương vị ẩm thực đặc sắc được chế biến từ những nguyên liệu tươi ngon nhất trong ngày bởi các đầu bếp hàng đầu.' }}
+                </div>
 
-                <form action="{{ route('cart.add') }}" method="POST">
-    @csrf
-    <input type="hidden" name="menu_id" value="{{ $menu->id }}">
-    
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+                <div class="order-controls">
+                    <div class="qty-box">
+                        <label style="display: block; font-size: 12px; color: #999; text-transform: uppercase;">Số lượng</label>
+                        <div class="qty-input-group">
+                            <input type="number" id="quantity" value="1" min="1" class="form-control">
+                        </div>
+                    </div>
+                    
+                    <button type="button" class="btn-add-cart" onclick="addToCart({{ $menu->id }})">
+                        <i class="fa fa-shopping-cart"></i> Thêm vào giỏ hàng
+                    </button>
+                </div>
 
-<div class="cart-action">
-    <label>Số lượng:</label>
-    <input type="number" id="quantity" value="1" min="1" class="form-control" style="width: 80px; display: inline-block; margin-bottom: 10px;">
-    
-    <br>
-    
-    <button type="button" class="btn-order" onclick="addToCart({{ $menu->id }})" style="background-color: #e74c3c; color: white; border: none; padding: 10px 20px; border-radius: 5px;">
-        THÊM VÀO GIỎ HÀNG
-    </button>
+                <!-- <div style="margin-top: 20px;">
+                    <span class="text-muted"><i class="fa fa-check-circle text-success"></i> Phục vụ tại chỗ</span>
+                    <span class="text-muted" style="margin-left: 20px;"><i class="fa fa-truck text-primary"></i> Giao hàng tận nơi</span>
+                </div> -->
+            </div>
+        </div>
+    </div>
+
+    <div class="comments-container">
+        <h3 style="margin-bottom: 30px; font-weight: bold; color: #333;">
+            <i class="fa fa-comments-o" style="color: #e74c3c;"></i> Đánh giá từ khách hàng
+        </h3>
+
+        @auth
+            <div class="comment-form-box">
+                <form action="{{ route('comment.store', $menu->id) }}" method="POST">
+                    @csrf
+                    <input type="hidden" name="menu_id" value="{{ $menu->id }}">
+                    <div class="row" style="margin-bottom: 15px;">
+                        <div class="col-sm-4">
+                            <label>Đánh giá sao:</label>
+                            <select name="rating" class="form-control" style="border-radius: 20px;">
+                                <option value="5">★★★★★ - Tuyệt vời</option>
+                                <option value="4">★★★★☆ - Ngon</option>
+                                <option value="3">★★★☆☆ - Tạm được</option>
+                                <option value="2">★★☆☆☆ - Không ngon</option>
+                                <option value="1">★☆☆☆☆ - Tệ</option>
+                            </select>
+                        </div>
+                    </div>
+                    <textarea name="content" class="comment-textarea" rows="3" placeholder="Chia sẻ trải nghiệm của bạn về món ăn..." required></textarea>
+                    <button type="submit" class="btn-add-cart" style="padding: 8px 25px; font-size: 14px;">Gửi đánh giá</button>
+                </form>
+            </div>
+        @else
+            <div class="alert alert-warning" style="border-radius: 15px;">
+                Vui lòng <a href="{{ route('login') }}" class="alert-link">đăng nhập</a> để để lại bình luận và đánh giá của bạn.
+            </div>
+        @endauth
+
+        <div class="comment-list">
+            @forelse($menu->comments as $comment)
+                <div class="comment-item">
+                    <img src="https://ui-avatars.com/api/?name={{ urlencode($comment->user->name) }}&background=e74c3c&color=fff" class="avatar-circle">
+                    <div style="flex: 1;">
+                        <div style="display: flex; justify-content: space-between;">
+                            <h5 style="margin: 0; font-weight: bold;">{{ $comment->user->name }}</h5>
+                            <small class="text-muted">{{ $comment->created_at->diffForHumans() }}</small>
+                        </div>
+                        <div style="color: #ffc107; font-size: 12px; margin: 5px 0;">
+                            @for($i = 1; $i <= 5; $i++)
+                                <i class="fa {{ $i <= $comment->rating ? 'fa-star' : 'fa-star-o' }}"></i>
+                            @endfor
+                        </div>
+                        <p style="color: #555; margin-bottom: 5px;">{{ $comment->content }}</p>
+                        
+                        @auth
+                            @if(Auth::id() === $comment->user_id)
+                                <form action="{{ route('comment.destroy', $comment->id) }}" method="POST">
+                                    @csrf @method('DELETE')
+                                    <button type="submit" style="background: none; border: none; color: #e74c3c; font-size: 12px; padding: 0;">
+                                        <i class="fa fa-trash"></i> Xóa bình luận
+                                    </button>
+                                </form>
+                            @endif
+                        @endauth
+                    </div>
+                </div>
+            @empty
+                <div class="text-center" style="padding: 40px; color: #bbb;">
+                    <i class="fa fa-commenting-o" style="font-size: 40px;"></i>
+                    <p>Chưa có đánh giá nào cho món ăn này.</p>
+                </div>
+            @endforelse
+        </div>
+    </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
 function addToCart(foodId) {
     let qty = document.getElementById('quantity').value;
-
     $.ajax({
         url: "{{ route('cart.add') }}",
         method: "POST",
@@ -108,7 +311,6 @@ function addToCart(foodId) {
             quantity: qty
         },
         success: function(response) {
-            // Thông báo thành công
             Swal.fire({
                 icon: 'success',
                 title: 'Đã thêm vào giỏ!',
@@ -116,29 +318,18 @@ function addToCart(foodId) {
                 showConfirmButton: false,
                 timer: 1500
             });
-
-            // Cập nhật số lượng trên icon giỏ hàng (nếu bạn có class .badge ở navbar)
             if(response.cart_count !== undefined) {
                 $('.badge').text(response.cart_count);
             }
         },
         error: function(xhr) {
-            let errorMsg = xhr.responseJSON ? xhr.responseJSON.error : 'Có lỗi xảy ra!';
             Swal.fire({
                 icon: 'error',
                 title: 'Lỗi...',
-                text: errorMsg,
+                text: xhr.responseJSON ? xhr.responseJSON.error : 'Vui lòng đăng nhập!',
             });
         }
     });
 }
 </script>
-</form>
-            </div>
-        </div>
-    </div>
-</div>
-
-<script src="{{ asset('js/jquery.min.js') }}"></script>
-<script src="{{ asset('js/bootstrap.js') }}"></script>
 @endsection

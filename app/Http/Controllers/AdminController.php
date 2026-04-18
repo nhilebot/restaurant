@@ -10,14 +10,18 @@ use Illuminate\Support\Facades\Auth;
 class AdminController extends Controller
 {
     public function __construct()
-    {
-        $this->middleware(function ($request, $next) {
-            if (Auth::user()->role !== 'admin') {
-                return redirect('/')->with('error', 'Bạn không có quyền truy cập.');
-            }
-            return $next($request);
-        });
-    }
+{
+    // Dòng 1: Đăng ký middleware auth
+    $this->middleware('auth');
+
+    // Dòng 2: Đăng ký middleware kiểm tra quyền admin riêng biệt
+    $this->middleware(function ($request, $next) {
+        if (!Auth::user() || Auth::user()->role->name !== 'admin') {
+            return redirect('/')->with('error', 'Bạn không có quyền truy cập.');
+        }
+        return $next($request);
+    });
+}
 
     public function index()
     {

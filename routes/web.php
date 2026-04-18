@@ -16,6 +16,8 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\OtpPasswordController;
 use Illuminate\Support\Facades\Mail;
 use App\Http\Controllers\ProfileController;
+use App\Models\Order;
+use App\Http\Controllers\CommentController;
 // --- TRANG CHỦ & THÔNG TIN CHUNG ---
 Route::get('/', function () { return view('layout'); });
 Route::get('/contact', [ContactController::class, 'index']);
@@ -87,7 +89,6 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/order/store', [OrderController::class, 'store'])->name('order.store');
 
     // Hệ thống Giỏ hàng
-    Route::get('/cart', [ReservationController::class, 'showCart'])->name('cart.index');
     
     Route::post('/cart/remove/{id}', [CartController::class, 'remove'])->name('cart.remove');
     Route::get('/clear-cart', [CartController::class, 'clear'])->name('cart.clear');
@@ -97,9 +98,15 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/reservation/store', [ReservationController::class, 'store'])->name('reservation.store');
 
     // Quản lý Admin
-    Route::get('/admin', [AdminController::class, 'index'])->name('admin.index');
-    Route::post('/admin/menu/{menu}/stock', [AdminController::class, 'updateStock'])->name('admin.updateStock');
-    Route::post('/admin/order/{order}/status', [AdminController::class, 'updateOrderStatus'])->name('admin.updateOrderStatus');
+    Route::middleware(['auth', 'isAdmin'])->group(function () {
+        Route::post('/admin/menu/{menu}/stock', [AdminController::class, 'updateStock'])->name('admin.updateStock');
+        Route::post('/admin/order/{order}/status', [AdminController::class, 'updateOrderStatus'])->name('admin.updateOrderStatus');
+        Route::get('/admin', [AdminController::class, 'index'])->name('admin.index');
+
+        // Quản lý danh mục
+        Route::resource('admin/categories', \App\Http\Controllers\AdminCategoryController::class, ['as' => 'admin']);
+    });
+
     Route::get('/orders/{id}', [OrderController::class, 'show']);
 
     Route::post('/reservation/auto-save', [ReservationController::class, 'autoSave'])->name('reservation.autoSave');
@@ -111,39 +118,22 @@ Route::middleware(['auth'])->group(function () {
     });
 
     return 'Đã gửi mail!';
+    });
 });
 // gọi đến profile
 Route::get('/profile', [App\Http\Controllers\ProfileController::class, 'index'])->middleware('auth');
-});
 
-Route::post('/orders/store', [OrderController::class, 'store'])->name('orders.store')->middleware('auth');
-Route::post('/orders/store', [OrderController::class, 'store'])->name('order.store');
-Route::post('/reservation/add-to-cart', [ReservationController::class, 'addToCartAjax'])->name('reservation.addToCartAjax');
+Route::get('/cart/get', [CartController::class, 'getCart'])->name('cart.get')->middleware('auth');
+Route::post('/cart/checkout', [App\Http\Controllers\CartController::class, 'checkout'])->name('cart.checkout')->middleware('auth');
+Route::post('/reservation/add-to-cart', [ReservationController::class, 'addToCartAjax'])->name('reservation.addToCart')->middleware('auth');
+Route::post('/reservation/save-note-ajax', [ReservationController::class, 'saveNoteAjax'])->name('reservation.saveNoteAjax')->middleware('auth');
 
-// Route::post('/cart/add-ajax', [CartController::class, 'addToCart'])->name('cart.addAjax');
-Route::get('/cart/get', [CartController::class, 'getCart'])->name('cart.get');
-Route::post('/cart/checkout', [App\Http\Controllers\CartController::class, 'checkout'])->name('cart.checkout');
-// Xóa từng món một
-Route::post('/cart/remove/{id}', [App\Http\Controllers\CartController::class, 'removeItem'])->name('cart.remove');
-// hiện thị lịch sử đơn hàng
-Route::get('/my-orders', [OrderController::class, 'history'])->name('orders.history');
-// hiển thị chi tiết đơn hàng
-Route::get('/order-history', [OrderController::class, 'history'])
-    ->name('orders.history')
-    ->middleware('auth');
-Route::middleware('auth')->group(function () {
-    // Trang hiển thị profile
-    Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
-
-    // THÊM DÒNG NÀY: Để xử lý nút "Lưu thay đổi"
-    Route::put('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
-});
-// Route cho nút Lưu thay đổi
-Route::put('/profile/update', [App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update'); 
-// Route::get('/reservation', [ReservationController::class, 'reservation']);   
-Route::post('/reservation/add-to-cart', [ReservationController::class, 'addToCartAjax'])->name('reservation.addToCart');
-Route::post('/reservation/save-note-ajax', [ReservationController::class, 'saveNoteAjax'])->name('reservation.saveNoteAjax');
-
-Route::get('/reservation', [ReservationController::class, 'index'])->name('reservation.index');
-Route::post('/reservation', [ReservationController::class, 'store'])->name('reservation.store');
-Route::post('/add-to-cart', [ReservationController::class, 'addToCartAjax'])->name('reservation.addToCart');
+Route::get('/cart', [CartController::class, 'index'])->name('cart.index')->middleware('auth');
+Route::get('/order-history', [OrderController::class, 'history'])->name('order-history')->middleware('auth');
+Route::get('/history', [CartController::class, 'history'])->name('orders.history');
+Route::get('cart/remove/{id}', [CartController::class, 'remove']);
+Route::put('/profile/update', [ProfileController::class, 'update'])
+    ->name('profile.update');
+// gọi cmt
+Route::post('/menu/{menuId}/comment', [CommentController::class, 'store'])->name('comment.store')->middleware('auth');
+Route::delete('/comment/{id}', [CommentController::class, 'destroy'])->name('comment.destroy')->middleware('auth');

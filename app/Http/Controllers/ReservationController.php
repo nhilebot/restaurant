@@ -28,7 +28,23 @@ class ReservationController extends Controller
     ->pluck('table_id')
     ->toArray();
 
-    $cart = session()->get('cart', []);
+    $dbCart = Cart::with('menu')
+    ->where('user_id', Auth::id())
+    ->get();
+
+$cart = [];
+
+foreach ($dbCart as $item) {
+    if (!$item->menu) continue;
+
+    $cart[] = [
+        'id' => $item->menu_id,
+        'name' => $item->menu->name,
+        'price' => $item->menu->price,
+        'quantity' => $item->quantity,
+        'image' => $item->menu->image,
+    ];
+}
 
     return view('reservation', compact('menus','bookedTableIds','cart'));
 }
@@ -64,37 +80,56 @@ public function store(Request $request)
 }
 public function addToCartAjax(Request $request)
 {
-    $cart = session()->get('cart', []);
     $id = $request->menu_id ?? $request->food_id;
 
-    // Kiểm tra món ăn có tồn tại không
     $menu = \App\Models\Menu::find($id);
     if (!$menu) {
-        return response()->json(['success' => false, 'message' => 'Món ăn không tồn tại!']);
+        return response()->json([
+            'success' => false,
+            'message' => 'Món ăn không tồn tại!'
+        ]);
     }
 
-    if (isset($cart[$id])) {
-        $cart[$id]['quantity']++;
+    // Lưu vào DATABASE (KHÔNG dùng session nữa)
+    $dbCartItem = \App\Models\Cart::where('user_id', auth()->id())
+        ->where('menu_id', $id)
+        ->first();
+
+    if ($dbCartItem) {
+        $dbCartItem->quantity += 1;
+        $dbCartItem->save();
     } else {
-        $cart[$id] = [
-            "id"       => $id,
-            "name"     => $menu->name,
-            "quantity" => 1,
-            "price"    => $menu->price,
-            "image"    => $menu->image
+        \App\Models\Cart::create([
+            'user_id' => auth()->id(),
+            'menu_id' => $id,
+            'quantity' => 1,
+        ]);
+    }
+
+    // Lấy lại toàn bộ cart từ DB
+    $dbCart = \App\Models\Cart::with('menu')
+        ->where('user_id', auth()->id())
+        ->get();
+
+    $cart = [];
+
+    foreach ($dbCart as $item) {
+        if (!$item->menu) continue;
+
+        $cart[] = [
+            'id' => $item->menu_id,
+            'name' => $item->menu->name,
+            'price' => $item->menu->price,
+            'quantity' => $item->quantity,
+            'image' => $item->menu->image,
         ];
     }
 
-    // === CHÈN ĐOẠN CODE MỚI VÀO ĐÂY ===
-    session()->put('cart', $cart);
-    session()->save(); 
-
     return response()->json([
-        'success' => true, 
+        'success' => true,
         'cartCount' => count($cart),
-        'cartData' => array_values($cart) // Giúp JavaScript nhận diện đúng định dạng mảng []
+        'cartData' => $cart
     ]);
-    // =================================
 }
 
 public function showCart() // Hoặc tên hàm nào Nhi dùng để mở trang thanh toán

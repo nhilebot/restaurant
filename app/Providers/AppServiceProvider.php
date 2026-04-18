@@ -1,8 +1,9 @@
 <?php
 
 namespace App\Providers;
-use Illuminate\Pagination\AbstractPaginator;
+
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Pagination\Paginator; // 1. PHẢI CÓ DÒNG NÀY Ở TRÊN CÙNG
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -19,6 +20,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        AbstractPaginator::useBootstrapFive();
+        // 2. THÊM DÒNG NÀY ĐỂ ÉP HIỂN THỊ NÚT BOOTSTRAP
+        Paginator::useBootstrap(); 
     }
 }

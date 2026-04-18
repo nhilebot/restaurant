@@ -557,7 +557,7 @@ div .fa-2x {
 }
 
 h1 {
-    text-transform: capitalize;
+    /* text-transform: capitalize; */
 }
 .navbar-default {
     border: 0 !important;
@@ -690,7 +690,7 @@ MEDIA QUERIES TABLET
         font-weight: 900;
         width: 280px;
         letter-spacing: 0.040em;
-        border: 1px solid #2f2e2f;
+        border: 0px solid #2f2e2f;
     }
     .picture_content {
         display: inline-block;

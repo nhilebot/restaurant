@@ -150,8 +150,8 @@
                     <div class="profile-left">
     <div class="avatar-container">
         {{-- Hiện ảnh từ storage, nếu chưa có thì hiện ảnh mặc định từ mạng --}}
-        <img src="{{ $user->avatar ? asset('storage/' . $user->avatar) : 'https://i.pravatar.cc/150' }}" 
-             id="avatar-preview" class="profile-avatar">
+        <img src="{{ $user->avatar ? asset('storage/' . $user->avatar) : 'https://ui-avatars.com/api/?name=' . $user->name }}" 
+     id="avatar-preview" class="profile-avatar">
         
         {{-- Nút bút chì: Khi bấm sẽ gọi cái ô chọn file ẩn ở dưới --}}
         <button type="button" class="edit-avatar-btn" onclick="document.getElementById('avatar-input').click();">
@@ -194,7 +194,7 @@
                             {{-- Ô 5: Tài khoản tham gia vào --}}
                             <div class="form-group-custom">
                                 <label>Tài khoản tham gia vào</label>
-                                <input type="text" value="{{ $user->created_at->format('d/m/Y') }}" class="input-custom" style="background-color: #eee; cursor: not-allowed;" readonly>
+                                <input type="text" value="{{ $user->created_at ? $user->created_at->format('d/m/Y') : '' }}" class="input-custom" style="background-color: #eee; cursor: not-allowed;" readonly>
                             </div>
 
                             {{-- Ô 6: Số điện thoại --}}

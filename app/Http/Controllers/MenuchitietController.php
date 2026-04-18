@@ -61,10 +61,10 @@ class MenuchitietController extends Controller
         return view('vietnamese', compact('menus'));
     }
 
-    public function showDetail($id)
-    {
-        $menu = Menu::findOrFail($id);
-        return view('detail', compact('menu')); // đổi nếu file view khác
-        
-    }
+   public function showDetail($id)
+{
+    $menu = Menu::with(['comments.user'])->findOrFail($id);
+    return view('detail', compact('menu'));
+}
+    
 }

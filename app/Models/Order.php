@@ -11,6 +11,10 @@ class Order extends Model
 
 protected $fillable = ['user_id', 'total_price', 'status', 'table_number', 'name', 
 'phone', 'address', 'payment_method','notes', 'menu_id'];
+protected $casts = [
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+    ];
 
     public function user()
     {

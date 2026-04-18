@@ -218,11 +218,13 @@
 @section('content')
 
 @php
-    $bankID = 'VBA'; 
-    $accountNo = '6320704409810'; 
-    $accountName = 'Tran Minh Hai Tam'; 
+    $bankID = 'MB'; 
+    $accountNo = '0343970743'; 
+    $accountName = 'Le Yen Nhi'; 
     $info = "Thanh toan Ban " . ($reservation['table'] ?? '0');
     $qrUrl = "https://img.vietqr.io/image/{$bankID}-{$accountNo}-compact.png?amount={$total}&addInfo={$info}&accountName={$accountName}";
+    $invoiceNumber = 'INV-' . strtoupper(substr(md5(now()->timestamp . auth()->id()), 0, 8));
+    $currentDateTime = now()->format('H:i d/m/Y');
 @endphp
 
 <div class="container">
@@ -246,9 +248,11 @@
         <div class="bill-info">
             <div class="row">
                 <div class="col-md-6">
+                    <p><strong>Mã hóa đơn:</strong> {{ $invoiceNumber }}</p>
+                    <p><strong>Thời gian hóa đơn:</strong> {{ $currentDateTime }}</p>
+                    <p><strong>Ngày đến:</strong> {{ $reservation['date'] }}</p>
+                    <p><strong>Giờ đến:</strong> {{ $reservation['time'] }}</p>
                     <p><strong>Khách hàng:</strong> {{ $reservation['name'] }}</p>
-                    <p><strong>Ngày đặt:</strong> {{ $reservation['date'] }}</p>
-                    <p><strong>Giờ đặt:</strong> {{ $reservation['time'] }}</p>
                 </div>
                 <div class="col-md-6 text-md-right">
                     <p><strong>Số bàn:</strong> <span class="badge badge-danger">Bàn {{ $reservation['table'] }}</span></p>
@@ -290,10 +294,11 @@
                             {{ number_format(($item['price'] ?? 0) * $item['quantity'], 0, ',', '.') }}đ
                         </td>
                         <td class="text-center">
-                            <form action="{{ route('cart.remove', $item['id']) }}" method="POST" onsubmit="return confirm('Xóa món này?')">
-                                @csrf
-                                <button type="submit" style="border:none; background:none; color:red; font-size:18px; cursor:pointer;">❌</button>
-                            </form>
+                            <a href="{{ route('cart.remove', $item['id']) }}" 
+   class="btn btn-sm btn-danger" 
+   onclick="return confirm('Xóa món này nhé?')">
+    <i class="fa fa-times"></i>
+</a>
                         </td>
                     </tr>
                     @empty
@@ -316,35 +321,41 @@
     @csrf
     <input type="hidden" name="total_price" value="{{ $total }}">
     <input type="hidden" name="table_number" value="{{ $reservation['table'] }}">
+    <input type="hidden" name="order_notes" value="{{ $reservation['notes'] ?? '' }}">
 
     <div class="payment-methods-box mt-4">
-        <h5 class="mb-3 font-weight-bold"><i class="fas fa-wallet mr-2"></i>Chọn phương thức thanh toán</h5>
-        
-        <label class="payment-item active" id="label-cod" onclick="toggleQR(false)">
-    <input type="radio" name="payment_method" value="COD" checked> <i class="fas fa-money-bill-wave"></i>
-    <div>
-        <h6>Thanh toán tại quầy</h6>
-        <small class="text-muted">Dùng tiền mặt hoặc quẹt thẻ</small>
-    </div>
-</label>
+    <h5 class="mb-3 font-weight-bold">
+        <i class="fas fa-wallet mr-2"></i>Chọn phương thức thanh toán
+    </h5>
 
-<label class="payment-item" id="label-bank" onclick="toggleQR(true)">
-    <input type="radio" name="payment_method" value="BANK"> 
-    <div>
-        <h6>Chuyển khoản (Quét mã QR)</h6>
-        <small class="text-muted">Thanh toán nhanh qua App ngân hàng</small>
-    </div>
-</label>
-
-       
-
-        <div id="qr-inline-area" class="text-center">
-            <h6 class="text-danger font-weight-bold mb-3">MÃ QR THANH TOÁN</h6>
-            <img src="{{ $qrUrl }}" alt="QR Code Payment" class="img-fluid mb-2">
-            <p class="small text-muted mb-0">Nội dung: <strong>{{ $info }}</strong></p>
-            <p class="small text-muted">Chủ TK: <strong>{{ $accountName }}</strong></p>
+    <!-- COD -->
+    <label class="payment-item active" id="label-cod">
+        <input type="radio" name="payment_method" value="COD" checked>
+        <i class="fas fa-money-bill-wave"></i>
+        <div>
+            <h6>Thanh toán tại quầy</h6>
+            <small class="text-muted">Dùng tiền mặt hoặc quẹt thẻ</small>
         </div>
+    </label>
+
+    <!-- BANK -->
+    <label class="payment-item" id="label-bank">
+        <input type="radio" name="payment_method" value="BANK">
+        
+        <div>
+            <h6>Chuyển khoản (Quét QR)</h6>
+            <small class="text-muted">Thanh toán nhanh qua ngân hàng</small>
+        </div>
+    </label>
+
+    <!-- QR AREA -->
+    <div id="qr-inline-area" class="text-center">
+        <h6 class="text-danger font-weight-bold mb-3">MÃ QR THANH TOÁN</h6>
+        <img src="{{ $qrUrl }}" alt="QR Code Payment" class="img-fluid mb-2">
+        <p class="small text-muted mb-0">Nội dung: <strong>{{ $info }}</strong></p>
+        <p class="small text-muted">Chủ TK: <strong>{{ $accountName }}</strong></p>
     </div>
+</div>
 
     <div class="text-center mt-5">
         <button type="button" class="btn-checkout shadow-lg" data-toggle="modal" data-target="#billModal">
@@ -367,15 +378,24 @@
                 </div>
                 <div class="luxury-divider" style="height:1px; background:#040404; margin:15px 0; opacity:0.1;"></div>
                 <div class="d-flex justify-content-between mb-2" style="font-size: 12px;">
-                    <span>Khách: <strong>{{ $reservation['name'] ?? 'Nhi' }}</strong></span>
-                    <span>Bàn: <strong class="text-danger">{{ $reservation['table'] ?? '1' }}</strong></span>
+                    <div>
+                        <p class="mb-1"><strong>Mã hóa đơn:</strong> {{ $invoiceNumber }}</p>
+                        <p class="mb-1"><strong>Thời gian hóa đơn:</strong> {{ $currentDateTime }}</p>
+                        <p class="mb-1"><strong>Ngày đến:</strong> {{ $reservation['date'] }}</p>
+                        <p class="mb-1"><strong>Giờ đến:</strong> {{ $reservation['time'] }}</p>
+                        <p class="mb-0"><strong>Khách:</strong> <strong>{{ $reservation['name'] ?? 'Nhi' }}</strong></p>
+                    </div>
+                    <div class="text-right">
+                        <p class="mb-1"><strong>Bàn:</strong> <span class="text-danger">{{ $reservation['table'] ?? '1' }}</span></p>
+                        <p class="mb-0"><strong>Ghi chú:</strong> <small class="text-muted">{{ $reservation['notes'] ?: 'Không có ghi chú' }}</small></p>
+                    </div>
                 </div>
                 <table class="table-premium">
                     <thead>
                         <tr>
-                            <th class="text-left">Món ăn</th>
+                            <th class="text-left">Tên sản phẩm</th>
                             <th class="text-center">SL</th>
-                            <th class="text-right">Tiền</th>
+                            <th class="text-right">Tổng cộng</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -465,35 +485,34 @@
         }
     }
 
-    // 2. CÁC HÀM DÙNG JQUERY (ĐẶT TRONG READY ĐỂ KHÔNG LỖI $)
-    $(document).ready(function () {
-    $('textarea[name="notes"]').on('change', function () {
-        let noteText = $(this).val();
+    document.addEventListener('DOMContentLoaded', function () {
 
-        fetch("{{ route('reservation.saveNoteAjax') }}", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRF-TOKEN": "{{ csrf_token() }}"
-            },
-            body: JSON.stringify({ notes: noteText })
-        })
-        .then(res => res.json())
-        .then(data => console.log(data))
-        .catch(err => console.error(err));
-    });
-});
-        $('textarea[name="notes"]').on('change', function() {
-            let noteText = $(this).val();
-            fetch("{{ route('reservation.saveNoteAjax') }}", {
-                method: "POST",
-                headers: { "Content-Type": "application/json", "X-CSRF-TOKEN": "{{ csrf_token() }}" },
-                body: JSON.stringify({ notes: noteText })
-            });
+    const qrArea = document.getElementById('qr-inline-area');
+    const labelCod = document.getElementById('label-cod');
+    const labelBank = document.getElementById('label-bank');
+    const radios = document.querySelectorAll('input[name="payment_method"]');
+
+    function updateUI(value) {
+        if (value === 'BANK') {
+            qrArea.style.display = 'block';
+            labelBank.classList.add('active');
+            labelCod.classList.remove('active');
+        } else {
+            qrArea.style.display = 'none';
+            labelCod.classList.add('active');
+            labelBank.classList.remove('active');
+        }
+    }
+
+    radios.forEach(radio => {
+        radio.addEventListener('change', function () {
+            updateUI(this.value);
         });
     });
 
-
-    
+    // trạng thái ban đầu
+    const checked = document.querySelector('input[name="payment_method"]:checked');
+    if (checked) updateUI(checked.value);
+});
 </script>
 @endsection

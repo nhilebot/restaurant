@@ -33,7 +33,7 @@
     <div class="breeze-card">
         <div class="text-center mb-4">
             <h3 class="login-title">Đăng Ký</h3>
-            <p class="subtitle-text">Gia nhập đại gia đình Tam Nhi Quán</p>
+            <p class="subtitle-text">Nhà hàng Việt</p>
         </div>
 
         <form id="registerForm">

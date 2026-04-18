@@ -9,6 +9,7 @@ use App\Models\Cart;
 use App\Models\Reservation;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 
 class CartController extends Controller
 {
@@ -41,13 +42,26 @@ public function index()
                             ->orderBy('created_at', 'desc')
                             ->first();
 
+    $reservationDate = $latestReservation && $latestReservation->reservation_date
+        ? Carbon::parse($latestReservation->reservation_date)->format('d/m/Y')
+        : date('d/m/Y');
+
+    $reservationTime = '--:--';
+    if ($latestReservation && $latestReservation->reservation_time) {
+        try {
+            $reservationTime = Carbon::parse($latestReservation->reservation_time)->format('H:i');
+        } catch (\Exception $e) {
+            $reservationTime = $latestReservation->reservation_time;
+        }
+    }
+
     $reservation = [
-        'date'   => $latestReservation ? $latestReservation->reservation_date : date('d/m/Y'),
+        'date'   => $reservationDate,
         'table'  => ($latestReservation && $latestReservation->table_id) ? $latestReservation->table_id : 'Chưa chọn',
         'status' => ($latestReservation && $latestReservation->status == 'confirmed') ? 'Đang xử lý' : 'Chờ xác nhận',
         'name'   => $latestReservation ? $latestReservation->full_name : (auth()->user()->name ?? 'Khách'),
-        'time'   => $latestReservation ? $latestReservation->reservation_time : '--:--', 
-        'notes'  => $latestReservation ? $latestReservation->notes : '', 
+        'time'   => $reservationTime,
+        'notes'  => $latestReservation ? $latestReservation->notes : '',
     ];
 
     // 3. Tính tổng tiền
@@ -191,27 +205,40 @@ public function removeItem($id)
     return redirect()->route('order-history') 
         ->with('success', 'Đơn hàng của bạn đã được gửi đi thành công!');
 }
+public function remove($id)
+{
+    $userId = auth()->id();
+
+    // Xóa món ăn cụ thể trong Database của User
+    \App\Models\Cart::where('user_id', $userId)
+                ->where('menu_id', $id)
+                ->delete();
+
+    // Quan trọng: Quay lại trang hiện tại (Giỏ hàng) kèm thông báo
+    return redirect()->back()->with('success', 'Đã xóa món ăn khỏi giỏ hàng!');
+}
 public function checkout(Request $request)
 {
     $userId = auth()->id();
 
-    // 1. Lấy giỏ hàng từ Session (giống như cách Nhi hiển thị ở Blade)
-    $cart = session()->get('cart', []);
+    // ✅ Lấy giỏ hàng từ DATABASE (KHÔNG dùng session nữa)
+    $cartItems = \App\Models\Cart::with('menu')
+        ->where('user_id', $userId)
+        ->get();
 
-    // Kiểm tra nếu giỏ hàng session rỗng
-    if (empty($cart)) {
+    if ($cartItems->isEmpty()) {
         return redirect()->back()->with('error', 'Giỏ hàng của bạn đang trống!');
     }
 
-    // 2. Tính tổng tiền từ session
+    // ✅ Tính tổng tiền
     $totalAmount = 0;
-    foreach ($cart as $item) {
-        $totalAmount += ($item['price'] ?? 0) * $item['quantity'];
+    foreach ($cartItems as $item) {
+        $totalAmount += ($item->menu->price ?? 0) * $item->quantity;
     }
 
     $pm = $request->input('payment_method');
 
-    // 3. Tạo đơn hàng (Giữ nguyên logic của Nhi)
+    // ✅ Tạo Order
     $order = \App\Models\Order::create([
         'user_id'        => $userId,
         'total_price'    => $totalAmount,
@@ -223,23 +250,30 @@ public function checkout(Request $request)
         'notes'          => $request->order_notes ?? null,
     ]);
 
-    // 4. Lưu từng món từ Session vào OrderItem
-    foreach ($cart as $item) {
+    // ✅ Lưu OrderItem từ DB cart
+    foreach ($cartItems as $item) {
         \App\Models\OrderItem::create([
             'order_id'     => $order->id,
-            'menu_id'      => $item['id'], // Dùng ID từ session
-            'quantity'     => $item['quantity'],
-            'price'        => $item['price'] ?? 0,
-            'product_name' => $item['name'] ?? '',
+            'menu_id'      => $item->menu_id,
+            'quantity'     => $item->quantity,
+            'price'        => $item->menu->price ?? 0,
+            'product_name' => $item->menu->name ?? '',
         ]);
     }
 
-    // 5. XÓA GIỎ HÀNG TRONG SESSION (Để giỏ hàng trống sau khi mua)
-    session()->forget('cart');
-
-    // Nếu Nhi có lưu cả trong Database thì xóa luôn (dòng này giữ lại nếu cần)
+    // ✅ XÓA GIỎ HÀNG DB
     \App\Models\Cart::where('user_id', $userId)->delete();
 
+    // (optional) xóa session nếu còn
+    session()->forget('cart');
+
     return redirect()->route('orders.history')->with('success', 'Thanh toán thành công!');
+}
+public function history()
+{
+    // Lấy danh sách đơn hàng của người dùng đang đăng nhập
+    // Sắp xếp theo thời gian mới nhất
+    $orders = \App\Models\Order::where('user_id', auth()->id())->get();
+    return view('cart.history', compact('orders')); // Dấu chấm đại diện cho thư mục cart/
 }
 }

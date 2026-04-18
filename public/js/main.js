@@ -4,6 +4,13 @@
 		$(document).on("scroll", onScroll);
  
 		$('a[href^="#"]').on('click', function (e) {
+			var target = this.hash;
+			
+			// Se href é apenas "#", ignora e permite comportamento padrão
+			if (!target || target === '#') {
+				return;
+			}
+			
 			e.preventDefault();
 			$(document).off("scroll");
  
@@ -12,14 +19,15 @@
 			})
 			$(this).addClass('navactive');
  
-			var target = this.hash;
 			$target = $(target);
-			$('html, body').stop().animate({
-				'scrollTop': $target.offset().top+2
-			}, 500, 'swing', function () {
-				window.location.hash = target;
-				$(document).on("scroll", onScroll);
-			});
+			if ($target.length) {
+				$('html, body').stop().animate({
+					'scrollTop': $target.offset().top+2
+				}, 500, 'swing', function () {
+					window.location.hash = target;
+					$(document).on("scroll", onScroll);
+				});
+			}
 		});
 	});
  

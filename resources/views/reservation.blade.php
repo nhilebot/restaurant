@@ -27,7 +27,7 @@
         }
         .reservation-section { background-color: #ffffff; padding-bottom: 60px; }
         .form-container-custom { max-width: 900px; margin: 40px auto; padding: 30px; background: #fff; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-        .form-title { font-family: 'Playball', cursive; color: #d9534f; font-size: 32px; text-align: center; margin-bottom: 30px; }
+        .form-title { cursive; color: #d9534f; font-size: 32px; text-align: center; margin-bottom: 30px; }
         .label-custom { font-weight: 600; color: #444; margin-top: 15px; display: block; margin-bottom: 8px; }
         .input-custom { height: 45px !important; border: 1px solid #ddd !important; border-radius: 5px !important; }
         .table-selection-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; margin-bottom: 25px; }
@@ -72,7 +72,7 @@ input[disabled] + label {
         <div class="reservation-section">
             <div class="container">
                 <div class="form-container-custom">
-                    <h2 class="form-title">Thông Tin Đặt Bàn</h2>
+                    <h2 class="form-title">Thông tin đặt bàn</h2>
 
                     <form id="reservation-form" method="post" action="{{ route('reservation.store') }}">
                         @csrf
@@ -121,8 +121,9 @@ input[disabled] + label {
                         </div>
 
                         <label class="label-custom">Thực đơn đặt trước</label>
-                        <button type="button" class="btn-food-select" id="openFoodModalBtn" 
-        data-toggle="modal" data-target="#foodMenuModal">
+                        <button type="button" class="btn-food-select" 
+        data-toggle="modal" 
+        data-target="#foodMenuModal">
     <i class="fa fa-search"></i> TÌM KIẾM VÀ CHỌN MÓN ĂN
 </button>
 
@@ -156,7 +157,7 @@ input[disabled] + label {
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
-                    <h4 class="modal-title">Thực Đơn Nhà Hàng</h4>
+                    <h4 class="modal-title">Thực đơn nhà hàng</h4>
                 </div>
                 <div class="modal-body" style="max-height: 600px; overflow-y: auto;">
                     <div class="search-container">
@@ -210,58 +211,70 @@ window.cart = cart;
         });
 
         // 2. Hàm hiển thị danh sách món ăn (Giữ nguyên của Nhi)
-        function renderMenu(filter = '') {
-            const listElement = document.getElementById('menu-list');
-            if (!listElement) return;
+// 2. Hàm hiển thị danh sách món ăn
+function renderMenu(filter = '') {
+    const listElement = document.getElementById('menu-list');
+    if (!listElement) return;
+    
+    if (!menuItems || menuItems.length === 0) {
+        listElement.innerHTML = '<div style="color: red; padding: 20px; text-align: center;">❌ Không nhận được dữ liệu menu!</div>';
+        return;
+    }
+
+    // --- DÁN VÀO ĐÂY ---
+    const categoryNames = {
+        'seafood': 'Hải Sản',
+        'special': 'Món Đặc Biệt',
+        'salad': 'Salad',
+        'Món khác': 'Các Món Khác'
+    };
+
+    const groups = menuItems.reduce((acc, item) => {
+        const rawCat = item.category || 'Món khác';
+        // Nếu tìm thấy tên trong từ điển thì dùng, không thì giữ nguyên tên gốc
+        const cat = categoryNames[rawCat] || rawCat; 
+        
+        if (!acc[cat]) acc[cat] = [];
+        acc[cat].push(item);
+        return acc;
+    }, {});
+    // --- HẾT ĐOẠN DÁN ---
+
+    let html = '';
+    for (const category in groups) {
+        const filteredItems = groups[category].filter(item => 
+            item.name.toLowerCase().includes(filter.toLowerCase())
+        );
+
+        if (filteredItems.length > 0) {
+            // Biến category ở đây bây giờ đã là tên tiếng Việt (Hải Sản, Rau Trộn...)
+            html += `<div class="category-divider">${category}</div><div class="menu-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">`;
             
-            if (!menuItems || menuItems.length === 0) {
-                listElement.innerHTML = '<div style="color: red; padding: 20px; text-align: center;">❌ Không nhận được dữ liệu menu!</div>';
-                return;
-            }
-
-            // Nhóm món ăn theo category
-            const groups = menuItems.reduce((acc, item) => {
-                const cat = item.category || 'Món khác';
-                if (!acc[cat]) acc[cat] = [];
-                acc[cat].push(item);
-                return acc;
-            }, {});
-
-            let html = '';
-            for (const category in groups) {
-                const filteredItems = groups[category].filter(item => 
-                    item.name.toLowerCase().includes(filter.toLowerCase())
-                );
-
-                if (filteredItems.length > 0) {
-                    // ĐÃ XÓA: Bỏ phần hiển thị số lượng kế bên tên Category
-                    html += `<div class="category-divider">${category}</div><div class="menu-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">`;
-                    
-                    filteredItems.forEach(item => {
-                        const isOutOfStock = item.stock <= 0;
-                        const imagePath = getImageUrl(item.image);
-                        
-                        html += `
-                            <div class="menu-card" style="border: 1px solid #ddd; padding: 10px; border-radius: 8px; background: #fff;">
-                                <img src="${imagePath}" 
-                                     alt="${item.name}"
-                                     style="width:100%; height:120px; object-fit:cover; border-radius: 4px;"
-                                     onerror="this.src='https://via.placeholder.com/200x160?text=Error+Image'">
-                                <div class="card-body" style="padding: 10px 0 0 0;">
-                                    <h5 style="font-size:14px; margin: 0 0 5px 0; height: 32px; overflow: hidden;">${item.name}</h5>
-                                    <p style="color:#d9534f; font-weight:bold; margin-bottom: 8px;">${formatCurrency(item.price)}đ</p>
-                                    <button type="button" onclick="addToCart(${item.id})" ${isOutOfStock ? 'disabled' : ''} 
-                                            style="width:100%; background:${isOutOfStock ? '#ccc' : '#d9534f'}; color:white; border:none; padding:8px; border-radius:4px; font-weight: bold;">
-                                        ${isOutOfStock ? 'Hết hàng' : 'Chọn'}
-                                    </button>
-                                </div>
-                            </div>`;
-                    });
-                    html += `</div>`;
-                }
-            }
-            listElement.innerHTML = html || '<p style="text-align: center; padding: 20px;">Không tìm thấy món ăn nào.</p>';
+            filteredItems.forEach(item => {
+                const isOutOfStock = item.stock <= 0;
+                const imagePath = getImageUrl(item.image);
+                
+                html += `
+                    <div class="menu-card" style="border: 1px solid #ddd; padding: 10px; border-radius: 8px; background: #fff;">
+                        <img src="${imagePath}" 
+                             alt="${item.name}"
+                             style="width:100%; height:120px; object-fit:cover; border-radius: 4px;"
+                             onerror="this.src='https://via.placeholder.com/200x160?text=Error+Image'">
+                        <div class="card-body" style="padding: 10px 0 0 0;">
+                            <h5 style="font-size:14px; margin: 0 0 5px 0; height: 32px; overflow: hidden;">${item.name}</h5>
+                            <p style="color:#d9534f; font-weight:bold; margin-bottom: 8px;">${formatCurrency(item.price)}đ</p>
+                            <button type="button" onclick="addToCart(${item.id})" ${isOutOfStock ? 'disabled' : ''} 
+                                    style="width:100%; background:${isOutOfStock ? '#ccc' : '#d9534f'}; color:white; border:none; padding:8px; border-radius:4px; font-weight: bold;">
+                                ${isOutOfStock ? 'Hết hàng' : 'Chọn'}
+                            </button>
+                        </div>
+                    </div>`;
+            });
+            html += `</div>`;
         }
+    }
+    listElement.innerHTML = html || '<p style="text-align: center; padding: 20px;">Không tìm thấy món ăn nào.</p>';
+}
         // 3. Hàm thêm vào giỏ (Giữ nguyên của Nhi)
         function addToCart(id) {
             const item = menuItems.find(i => i.id === id);

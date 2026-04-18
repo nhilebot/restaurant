@@ -17,4 +17,18 @@ class Menu extends Model
     {
         return $this->hasMany(OrderItem::class);
     }
+    public function comments()
+{
+    return $this->hasMany(Comment::class)->where('status', 1)->orderBy('created_at', 'desc');
+}
+
+public function getAverageRatingAttribute()
+{
+    return $this->comments()->avg('rating') ?: 5;
+}
+
+public function getCommentsCountAttribute()
+{
+    return $this->comments()->count();
+}
 }
